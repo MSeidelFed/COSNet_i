@@ -73,6 +73,18 @@ def grab_struct_data(ObjName, IDxDict, NamesList, CIFDict, address):
                 structfile.write('\n')
         structfile.close()
 
+def check_entityname(entnamelist):
+    allowedchars = ['-', '(', ')', ' ']
+    for i in range(0,len(entnamelist)):
+        name = entnamelist[i].split()
+        name = ''.join(name)
+        if not name.isalnum():
+            edited_name = ['_' if (not x.isalnum() and x not in allowedchars) else x for x in list(entnamelist[i])]
+            edited_name = ''.join(edited_name)
+            entnamelist[i] = edited_name
+    return entnamelist
+          
+
 def parse_arguments():
     parser = argparse.ArgumentParser(usage="python3 %(prog)s [-h] <pathto/CIFfile> <outpath>",
                                      description="Splits CIF into separate PDB files per entity")
@@ -94,9 +106,10 @@ if __name__ == "__main__":
     # get lists of identifiers and entities
     ent_id = cif_dict["_entity_poly.entity_id"]
     ent_name = cif_dict["_entity.pdbx_description"]
+    new_ent_name = check_entityname(ent_name)
     ent_atom_ids = cif_dict["_atom_site.label_entity_id"]
     # get dictionary of indices per entity indicating corresponding rows
     # of the atomic data 
     IDxDict = lower_upper_idx(ent_atom_ids)
-    grab_struct_data(obj_name, IDxDict, ent_name, cif_dict, address)
+    grab_struct_data(obj_name, IDxDict, new_ent_name, cif_dict, address)
 
