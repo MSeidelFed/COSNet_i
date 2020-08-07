@@ -39,6 +39,8 @@ def grab_struct_data(ObjName, IDxDict, NamesList, CIFDict, address):
     if address[:-1] != "/":
         address = address + "/"
 
+    print(f'Output PDBs found in: {address}\n')
+
     atomlist = CIFDict["_atom_site.group_PDB"]
     atomid_num = CIFDict["_atom_site.id"]
     atomid_lbl = CIFDict["_atom_site.label_atom_id"]
@@ -60,7 +62,12 @@ def grab_struct_data(ObjName, IDxDict, NamesList, CIFDict, address):
         if 'protein' in entity_name: 
             protid = entity_name.split('_protein_')
             entity_name = f'{protid[1]}_{protid[0]}'
-        structfile = open(f'{address}{ObjName}_{entity_name}.pdb', 'w+')
+        try:
+            structfile = open(f'{address}{ObjName}_{entity_name}.pdb', 'w+')
+        except:
+            print('Error in opening file: Check that naming and path scheme is correct!')
+            print('Moving onto next entity.\n')
+            continue
         bounds = IDxDict[i]
         k = 1
         for j in range(bounds[0],bounds[1]+1):
@@ -74,6 +81,11 @@ def grab_struct_data(ObjName, IDxDict, NamesList, CIFDict, address):
         structfile.close()
 
 def check_entityname(entnamelist):
+    """
+    Checks for and replaces non alpha-numeric characters with underscore,
+    allows: -, (, ), empty space.
+    Returns list of edited entity names.
+    """
     allowedchars = ['-', '(', ')', ' ']
     for i in range(0,len(entnamelist)):
         name = entnamelist[i].split()
@@ -93,23 +105,28 @@ def parse_arguments():
     args = parser.parse_args()
     return args
     
-## MAIN
-if __name__ == "__main__":
+def main():
     # get arguments
     Args = parse_arguments()
+
     # read in data file from command line
     pathtociffile = Args.CIFfile
     obj_name = os.path.basename(pathtociffile)[:-4]    
     address = Args.outpath
+
     # save contents as a dictionary
     cif_dict = MMCIF2Dict(pathtociffile)
+
     # get lists of identifiers and entities
     ent_id = cif_dict["_entity_poly.entity_id"]
     ent_name = cif_dict["_entity.pdbx_description"]
     new_ent_name = check_entityname(ent_name)
     ent_atom_ids = cif_dict["_atom_site.label_entity_id"]
-    # get dictionary of indices per entity indicating corresponding rows
-    # of the atomic data 
+
+    # get dictionary of indices per entity indicating corresponding rows of the atomic data 
     IDxDict = lower_upper_idx(ent_atom_ids)
     grab_struct_data(obj_name, IDxDict, new_ent_name, cif_dict, address)
-
+    
+## MAIN
+if __name__ == "__main__":
+    main()
