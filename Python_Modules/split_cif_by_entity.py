@@ -9,6 +9,7 @@ from sys import argv
 from Bio.PDB.MMCIFParser import MMCIFParser
 from Bio.PDB.MMCIF2Dict import MMCIF2Dict
 from collections import Counter
+import argparse
 import os
 import glob
 ## FUNCTIONS
@@ -72,31 +73,30 @@ def grab_struct_data(ObjName, IDxDict, NamesList, CIFDict, address):
                 structfile.write('\n')
         structfile.close()
 
-
+def parse_arguments():
+    parser = argparse.ArgumentParser(usage="python3 %(prog)s [-h] <pathto/CIFfile> <outpath>",
+                                     description="Splits CIF into separate PDB files per entity")
+    parser.add_argument("CIFfile", help="CIF file input to be split", type=str)
+    parser.add_argument("outpath",help="Output path", type=str)
+    args = parser.parse_args()
+    return args
+    
 ## MAIN
 if __name__ == "__main__":
-
-    # print usage
-    if len(argv) != 3:
-        print('################################################################################################\n')
-        print('               Usage: python3 split_cif_by_entity.py [pathtoCIF] [pathtooutput]               \n')
-        print('################################################################################################\n')
-    else:
-        # read in data file from command line
-        pathtociffile = argv[1]
-        obj_name = os.path.basename(pathtociffile)[:-4]    
-        address = argv[2]
-        if address == '.':
-            address = os.getcwd()
-            print(address)
-        # save contents as a dictionary
-        cif_dict = MMCIF2Dict(pathtociffile)
-        # get lists of identifiers and entities
-        ent_id = cif_dict["_entity_poly.entity_id"]
-        ent_name = cif_dict["_entity.pdbx_description"]
-        ent_atom_ids = cif_dict["_atom_site.label_entity_id"]
-        # get dictionary of indices per entity indicating corresponding rows
-        # of the atomic data 
-        IDxDict = lower_upper_idx(ent_atom_ids)
-        grab_struct_data(obj_name, IDxDict, ent_name, cif_dict, address)
+    # get arguments
+    Args = parse_arguments()
+    # read in data file from command line
+    pathtociffile = Args.CIFfile
+    obj_name = os.path.basename(pathtociffile)[:-4]    
+    address = Args.outpath
+    # save contents as a dictionary
+    cif_dict = MMCIF2Dict(pathtociffile)
+    # get lists of identifiers and entities
+    ent_id = cif_dict["_entity_poly.entity_id"]
+    ent_name = cif_dict["_entity.pdbx_description"]
+    ent_atom_ids = cif_dict["_atom_site.label_entity_id"]
+    # get dictionary of indices per entity indicating corresponding rows
+    # of the atomic data 
+    IDxDict = lower_upper_idx(ent_atom_ids)
+    grab_struct_data(obj_name, IDxDict, ent_name, cif_dict, address)
 
