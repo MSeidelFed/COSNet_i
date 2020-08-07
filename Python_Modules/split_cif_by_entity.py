@@ -78,6 +78,7 @@ def grab_struct_data(ObjName, IDxDict, NamesList, CIFDict, address):
             k += 1
             if j != bounds[1]:
                 structfile.write('\n')
+        structfile.write('\nTER')
         structfile.close()
 
 def check_entityname(entnamelist):
