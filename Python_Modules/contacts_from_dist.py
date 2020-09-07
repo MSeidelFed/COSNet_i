@@ -12,6 +12,7 @@ from sys import argv
 import numpy as np
 import os
 import glob
+import argparse
 ## FUNCTIONS
 def get_files_list(inputfile):
     """ """
@@ -54,7 +55,7 @@ def get_structure(protname, datapath):
     """
     """
     parser = PDBParser(PERMISSIVE=1)
-    pdblist = glob.glob(f'{datapath}/*{protname}*.pdb')
+    pdblist = glob.glob(f'{datapath}/*{protname}[_.]*.pdb') ###
     
     if len(pdblist) > 1:
         print(pdblist)
@@ -80,9 +81,9 @@ def count_atoms_under_thresh(struct1, struct2, ent1, ent2, threshold, resultspat
     """Takes in list of interacting residues and counts number of atoms per residue
        that are falling under the threshold value
     """
-    contactfile = glob.glob(f'{resultspath}/contacts_t{threshold}*{ent1}**{ent2}*')    
+    contactfile = glob.glob(f'{resultspath}/contacts_t{threshold}_{ent1}_{ent2}[._]*')   ### 
     if not contactfile:
-        contactfile = glob.glob(f'{resultspath}/contacts_t{threshold}*{ent2}**{ent1}*')
+        contactfile = glob.glob(f'{resultspath}/contacts_t{threshold}_{ent2}_{ent1}[._]*')    ###
     print('Contact File: ')
     print(os.path.basename(contactfile[0]))
     print('Contact Residues: ')
@@ -187,66 +188,74 @@ def append_count_info(per_res_count_list, total_atom_count_list, ent1name, ent2n
     f = open(outfile, 'w')
     f.write('\n'.join(output))
     f.close()
- 
     return
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(usage="python3 %(prog)s [-h] <threshold> <pathto/input> <pathtocsvs> <pathtopdbs> <outpath>",
+                                     description="Finds residues in contact under a defined distance threshold")
+    parser.add_argument("threshold", help="Value (angstroms) representing distance under which residues are in contact (normally 8)", type=int)
+    parser.add_argument("inputfile", help="One CSV or a text file with list of CSV (distance matrices)", type=str)
+    parser.add_argument("pathtocsvs", help="Path to where CSVs are located", type=str)
+    parser.add_argument("pathtopdbs", help="Path to where PDBs are located", type=str)
+    parser.add_argument("outpath", help="Output path for contact files", type=str)
+    args = parser.parse_args()
+    return args
+ 
 ## MAIN
 if __name__ == "__main__":
+    # get arguments
+    Args = parse_arguments()
+    threshold = Args.threshold
+    pathto_infile = Args.inputfile
+    infile = os.path.basename(pathto_infile)
 
-    # print usage
-    if len(argv) != 6:
-        print('#############################################################################################################\n')
-        print('  Usage: python3 contacts_from_dist.py [threshold] [pathtoinput] [pathtocsvs] [pathtopdbs] [pathtooutput]    \n')
-        print('          The threshold (in angstroms) is the distance under which two residues are in contact               \n')
-        print('#############################################################################################################\n')
+    pathto_csvs = Args.pathtocsvs
+    pathto_pdbs = Args.pathtopdbs
+    output_path = Args.outpath
+
+    # is input file one csv or a file listing csvs? 
+    if infile[-4:] != '.csv':
+        FilesList = get_files_list(pathto_infile)
     else:
-        # read in args
-        threshold = argv[1]
-        pathto_infile = argv[2]
-        infile = os.path.basename(pathto_infile)
+        FilesList = [infile]
 
-        pathto_csvs = argv[3]
-        pathto_pdbs = argv[4]
-        output_path = argv[5]
-
-        # is input file one csv or a file listing csvs? 
-        if infile[-4:] != '.csv':
-            FilesList = get_files_list(pathto_infile)
-        else:
-            FilesList = [infile]
-
-        NonContactList = []
-        ContactList = []
-        SummedCountList = []
-        count = 0
-        for afile in FilesList:
-            print('+++++++++++++++++++++++++++++++++++++')
-            print(f'Distance File: {afile}')
-            fileparts = afile.split('_')
-            ent1 = fileparts[2]
-            ent2 = fileparts[3].split('.')[0]
-            print(f'Comparing: {ent1} {ent2}')
-            # Load data
-            filename = os.path.join(pathto_csvs, afile)
-            print(filename)
+    NonContactList = []
+    ContactList = []
+    SummedCountList = []
+    count = 0
+    for afile in FilesList:
+        print('+++++++++++++++++++++++++++++++++++++')
+        print(f'Distance File: {afile}')
+        fileparts = afile.split('_')
+        ent1 = fileparts[2]
+        ent2 = fileparts[3].split('.')[0]
+        print(f'Comparing: {ent1} {ent2}')
+        # Load data
+        filename = os.path.join(pathto_csvs, afile)
+        print(filename)
+        try:
             DistMtx = read_dist_mtx(filename)
-            # Find contacts and output to respective files
-            NonConList, ConList = find_contact_idx(DistMtx, ent1, ent2, NonContactList, ContactList, threshold, output_path)
-            count +=1
-            print(f'Running on protein pair {count}')
-            pair = (ent1, ent2)
-            if not pair in NonConList:
-                print('CONTACTS EXIST')
-                # Parse out structures
-                StructEnt1 = get_structure(ent1, pathto_pdbs)
-                StructEnt2 = get_structure(ent2, pathto_pdbs)
-                # Calculate atoms in contacts
-                PerResCountList, PerResAtomCountList = count_atoms_under_thresh(StructEnt1, StructEnt2, ent1, ent2, threshold, output_path)
-                # Print out where you are
-                SummedCountList.append((sum(PerResCountList), sum(PerResAtomCountList)))
-                append_count_info(PerResCountList, PerResAtomCountList, ent1, ent2, threshold, output_path)
-            else:
-                print('NO CONTACTS UNDER THRESHOLD')
-            print('=====================================\n')
+        except: 
+            print(f'WARNING: {filename} not found in {pathto_csvs}')
+            continue
+        # Find contacts and output to respective files
+        NonConList, ConList = find_contact_idx(DistMtx, ent1, ent2, NonContactList, ContactList, threshold, output_path)
+        count +=1
+        print(f'Running on protein pair {count}')
+        pair = (ent1, ent2)
+        if not pair in NonConList:
+            print('CONTACTS EXIST')
+            # Parse out structures
+            StructEnt1 = get_structure(ent1, pathto_pdbs)
+            StructEnt2 = get_structure(ent2, pathto_pdbs)
+            # Calculate atoms in contacts
+            PerResCountList, PerResAtomCountList = count_atoms_under_thresh(StructEnt1, StructEnt2, ent1, ent2, threshold, output_path)
+            # Print out where you are
+            SummedCountList.append((sum(PerResCountList), sum(PerResAtomCountList)))
+            append_count_info(PerResCountList, PerResAtomCountList, ent1, ent2, threshold, output_path)
+        else:
+            print('NO CONTACTS UNDER THRESHOLD')
+        print('=====================================\n')
 
-        print_summary_output(NonConList, SummedCountList, f'summary_noncontacts_t{threshold}.txt', output_path)
-        print_summary_output(ConList, SummedCountList, f'summary_contacts_t{threshold}.txt', output_path)
+    print_summary_output(NonConList, SummedCountList, f'summary_noncontacts_t{threshold}.txt', output_path)
+    print_summary_output(ConList, SummedCountList, f'summary_contacts_t{threshold}.txt', output_path)
