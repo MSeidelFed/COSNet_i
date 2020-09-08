@@ -16,3 +16,20 @@ Below is an illustration of the workflow. Current work is in progress to develop
 **Workflow**
 
 ![Workflow](images/intcryomics_workflow.png)
+
+
+## Installation
+
+Clone the repo:
+```
+git clone https://github.com/MSeidelFed/IntCryOmics_Package.git
+```
+Create a virtual environment. This step is optional
+```
+virtualenv venv
+source venv/bin/activate
+```
+Install python dependencies
+```
+pip install -r requirements.txt
+```
