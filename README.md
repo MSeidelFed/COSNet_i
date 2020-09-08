@@ -26,6 +26,7 @@ git clone https://github.com/MSeidelFed/IntCryOmics_Package.git
 ```
 Create a virtual environment. This step is optional
 ```
+pip install --user virtualenv
 virtualenv venv
 source venv/bin/activate
 ```
