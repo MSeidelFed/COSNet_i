@@ -170,7 +170,7 @@ Output 2: contacts_t8_eL37_eL39_full.dat = 17 51 7.129363 49 18 First is residue
 The first two columns of Output 1 are used to fit the network, and in order to prepare the edgelist for the random walk, one must also create an edges_with_weights.txt file, containing the numbers of amino acids in contact as well as the nodes in contact. This is simply:
 
 ```
-$ awk '{print $1" "$2" "$3}' trial_contacts/summary_contacts_t8.txt > edges_with_weights.txt
+$ awk '{print $1" "$2" "$3}' trial_contacts/summary_contacts_t8.txt > Results/edges_with_weights_4v7e_t8.txt
 ```
 
 ### Random Walk and Fisher Exact Test
