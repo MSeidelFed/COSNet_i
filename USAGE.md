@@ -180,7 +180,7 @@ _e.g.:_
 
 _Usage:_ ```python3 intcryomics.py <filewithedgelist> <sigfile> <walklength> <iterationnum>```
 ```bash
-$ python3 Python_Modules/intcryomics.py edges_with_weights.txt Data/significance_file 20 10 > IntCryOmics_4v7e_t20.txt
+$ python3 Python_Modules/intcryomics.py edges_with_weights.txt Data/significance_file 20 10 > Results/IntCryOmics_4v7e_t20.txt
 ```
 
 ### List of nodes
