@@ -18,6 +18,7 @@ from Bio.PDB import PDBParser
 from Bio.PDB.MMCIF2Dict import MMCIF2Dict
 import numpy as np
 import os 
+import argparse
 
 global THREE_TO_ONE
 THREE_TO_ONE = {'ALA': 'A', 'ARG': 'R', 'ASN': 'N',
@@ -116,50 +117,51 @@ def write_out_fasta(fasta_dict, outfile, outpath,flag='w'):
             f.write(''.join([v, '\n']))
     os.rename(outfile, os.path.join(outpath, outfile))
 
+def parse_arguments():
+    parser = argparse.ArgumentParser(usage="python3 %(prog)s [-h] <pathto/pdbfile> <pathto/CIFfile> <entitynum> <type> <outpath>",
+                                     description="Extracts sequence from CIF file, and also from the corresponding PDB file")
+    parser.add_argument("pdbfile", help="PDB file", type=str)
+    parser.add_argument("ciffile", help="CIF file", type=str)
+    parser.add_argument("entitynum", help="Entity number corresponding to protein, as listed in CIF file (look this up!)", type=int)
+    parser.add_argument("type", help="Tag for sequence type: protein, RNA, DNA", type=str)
+    parser.add_argument("outputpath", help="Output type", type=str)
+    args = parser.parse_args()
+    return args
+
 ## MAIN
 if __name__ == "__main__":
+    # parse args
+    Args = parse_arguments()
+    pathto_pdbfile = Args.pdbfile
+    pdbname = os.path.basename(pathto_pdbfile)[:-4]
+    pathto_ciffile = Args.ciffile
+    cifname = os.path.basename(pathto_ciffile)[:-4]
+    entitynum = int(Args.entitynum)
+    typetag = str(Args.type) # protein, RNA, DNA
+    print(f'----------------------- Type: {typetag}')
+    outpath = Args.outputpath
+    print(f'Entity Number: {entitynum}')
+    #parse out structure and identifiers
+    Structure, StructID, EntID, Residues = get_struct(pathto_pdbfile, pdbname, cifname)
+    print(f'mmCIF: {StructID} PDB: {EntID}')
 
-    #print out help statments
-    if len(argv) != 6:
-        print('################################################################################################\n')
-        print('    Usage: python3 extract_sequence.py [pathtoPDB] [pathtoCIF] [EntityNum] [Type] [pathtoOutput]\n')
-        print("    Requires 5 arguments, don't forget to look up the entity number for PDB in the CIF\n")
-        print('################################################################################################\n')
-   
-    else:
-        #read in comparison files
-        pathto_pdbfile = argv[1]
-        pdbname = os.path.basename(pathto_pdbfile)[:-4]
-        pathto_ciffile = argv[2]
-        cifname = os.path.basename(pathto_ciffile)[:-4]
-        entitynum = int(argv[3])
-        typetag = str(argv[4]) # protein, RNA, DNA
-        print(f'----------------------- Type: {typetag}')
-        outpath = argv[5]
-        if outpath == ".":
-            outpath = os.getcwd()
-        print(f'Entity Number: {entitynum}')
-        #parse out structure and identifiers
-        Structure, StructID, EntID, Residues = get_struct(pathto_pdbfile, pdbname, cifname)
-        print(f'mmCIF: {StructID} PDB: {EntID}')
+    #get sequence from mmCIF file
+    cifdict = MMCIF2Dict(pathto_ciffile)
+    CIFSeq = get_prot_res_seq_cif(cifdict, entitynum)
+    print(f'Sequence from mmCIF: {CIFSeq}')
+    #get sequence from pdb file
+    PDBSeq = get_prot_res_seq_pdb(Residues, typetag)
+    print(f'Sequence from PDB: {PDBSeq}')
+  
+    #verify sequences are equal
+    if CIFSeq != PDBSeq:
+        print(f'{StructID} {EntID} {entitynum}: Sequences do not match')
 
-        #get sequence from mmCIF file
-        cifdict = MMCIF2Dict(pathto_ciffile)
-        CIFSeq = get_prot_res_seq_cif(cifdict, entitynum)
-        print(f'Sequence from mmCIF: {CIFSeq}')
-        #get sequence from pdb file
-        PDBSeq = get_prot_res_seq_pdb(Residues, typetag)
-        print(f'Sequence from PDB: {PDBSeq}')
-     
-        #verify sequences are equal
-        if CIFSeq != PDBSeq:
-            print(f'{StructID} {EntID} {entitynum}: Sequences do not match')
+    #print out structural sequence to 
+    seqsdict = {}
+    seqsdict[f'{EntID}_cifseq'] = CIFSeq
+    seqsdict[f'{EntID}_PDBseq'] = PDBSeq
+    outfile = f'{pdbname}.fasta'
 
-        #print out structural sequence to 
-        seqsdict = {}
-        seqsdict[f'{EntID}_cifseq'] = CIFSeq
-        seqsdict[f'{EntID}_PDBseq'] = PDBSeq
-        outfile = f'{pdbname}.fasta'
-
-        #outpath = f'{pdbfile[:-4]}.fasta'
-        write_out_fasta(seqsdict, outfile, outpath, 'w')
+    #outpath = f'{pdbfile[:-4]}.fasta'
+    write_out_fasta(seqsdict, outfile, outpath, 'w')
