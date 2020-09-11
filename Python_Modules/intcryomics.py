@@ -18,6 +18,7 @@ import math
 import pickle
 import itertools
 from statsmodels.sandbox.stats.multicomp import multipletests
+import argparse
 ## FUNCTIONS
 def get_network_from_edges(edgelistfile):
     """ """
@@ -374,59 +375,63 @@ def check_connection(subgraphnodes, originalgraph):
 
     return val
 
+def parse_arguments():
+    parser = argparse.ArgumentParser(usage="python3 %(prog)s <edgelistfile> <sigfile> <walklength> <iterationnum>",
+                                     description="Performs IntCryOmics analysis.")
+    parser.add_argument("edgelistfile", help="File with proximity network edges listed", type=str)
+    parser.add_argument("significancefile", help="File with significance values per protein", type=str)
+    parser.add_argument("walklength", help="Walklength for random walk sampling", type=int)
+    parser.add_argument("iterationnum", help="Number of times to repeat random walk", type=int)
+    args = parser.parse_args()
+    return args
+
 ## MAIN
 if __name__ == "__main__":
+    # parse arguments
+    Args = parse_arguments()
+    infile = Args.edgelistfile
+    sigfile = Args.significancefile
+    walk_length = int(Args.walklength)
+    iteration_num = int(Args.iterationnum)
+    # get respective matrices and print out, get nodes list
+    Net, Adjmtx = get_network_from_edges(infile)
+    Tmtx = transit_design(Adjmtx)
+    Nodelist = list(Net.nodes())
 
-    # usage
-    if len(argv) != 5:
-        print('################################################################################################\n')
-        print('    Usage: python3 intcryomics.py [filewithedgelist] [sigfile] [walklength] [iterationnum]   \n')
-        print('################################################################################################\n')
-    else:
-        # read in data
-        infile = argv[1]
-        sigfile = argv[2]
-        walk_length = int(argv[3])
-        iteration_num = int(argv[4])
-        # get respective matrices and print out, get nodes list
-        Net, Adjmtx = get_network_from_edges(infile)
-        Tmtx = transit_design(Adjmtx)
-        Nodelist = list(Net.nodes())
+    # iteratively induce random walk, save to a dictionary
+    WalksDict = random_walk_new(Net, Tmtx, iteration_num, walk_length)
+    # WalksDict = iterate_random_walk(Nodelist, iteration_num, Tmtx, walk_length)
 
-        # iteratively induce random walk, save to a dictionary
-        WalksDict = random_walk_new(Net, Tmtx, iteration_num, walk_length)
-        # WalksDict = iterate_random_walk(Nodelist, iteration_num, Tmtx, walk_length)
+    # read in significance values and check for agreement with nodelist
+    #SigDict = get_significance_values(sigfile)
+    SigDict = get_sig_vals_full(sigfile)
+    Difflist = [x for x in Nodelist if x not in set(list(SigDict.keys()))] 
 
-        # read in significance values and check for agreement with nodelist
-        #SigDict = get_significance_values(sigfile)
-        SigDict = get_sig_vals_full(sigfile)
-        Difflist = [x for x in Nodelist if x not in set(list(SigDict.keys()))] 
-
-        # any missing proteins from data are replaced with 0, assumed non-significance
-        for missingprot in Difflist:
-            SigDict[missingprot] = [0]
+    # any missing proteins from data are replaced with 0, assumed non-significance
+    for missingprot in Difflist:
+        SigDict[missingprot] = [0]
   
 
-        # counts visits per node, saves to a dict, keep only proteins that meet threshold cutoff
-        SampledSetsDict = summarise_random_walk_results(WalksDict, Nodelist, iteration_num)
-        ListofSets = get_subsets(SampledSetsDict, Nodelist, iteration_num)
+    # counts visits per node, saves to a dict, keep only proteins that meet threshold cutoff
+    SampledSetsDict = summarise_random_walk_results(WalksDict, Nodelist, iteration_num)
+    ListofSets = get_subsets(SampledSetsDict, Nodelist, iteration_num)
 
-        # get minimum set cover of the list of sets, save as a dict
-        Cover = get_minimum_set_cover(Nodelist, ListofSets)
+    # get minimum set cover of the list of sets, save as a dict
+    Cover = get_minimum_set_cover(Nodelist, ListofSets)
 
-        print(f'Covering Set: {Cover}\n')
-        print('Sampled Regions')
-        DictofSets = {}
+    print(f'Covering Set: {Cover}\n')
+    print('Sampled Regions')
+    DictofSets = {}
+    ProtNames = []
+    for i in range(0, len(Cover)):
+        DictofSets[i] = Cover[i] 
+        for j in range(0, len(Cover[i])):
+            idxlist = list(Cover[i])
+            ProtNames.append(Nodelist[idxlist[j]])
+        print(f'Region {i}:\t{ProtNames}')
         ProtNames = []
-        for i in range(0, len(Cover)):
-            DictofSets[i] = Cover[i] 
-            for j in range(0, len(Cover[i])):
-                idxlist = list(Cover[i])
-                ProtNames.append(Nodelist[idxlist[j]])
-            print(f'Region {i}:\t{ProtNames}')
-            ProtNames = []
-        print('\n')
-        
+    print('\n')
+      
 
         # calculate overlap between sets in minimum cover
 ##        DictofOverlap = calculate_overlap(Cover)
@@ -443,17 +448,17 @@ if __name__ == "__main__":
 ##            print(f'{names} {Connected}')
 ##        print('\n')
 
-        TestDict, ListofPs = fishers_exact_test_regions(DictofSets, Nodelist, SigDict)
-        print(TestDict)
+    TestDict, ListofPs = fishers_exact_test_regions(DictofSets, Nodelist, SigDict)
+    print(TestDict)
 
-        print('\n')
-        print(ListofPs)
+    print('\n')
+    print(ListofPs)
 
 
-        #multiple testing correction, bonferroni
-        adjust_pvals = multipletests(ListofPs, method='bonferroni')
-        print('\nAdjusted p-values after Bonferroni:')
-        print(adjust_pvals) 
+    #multiple testing correction, bonferroni
+    adjust_pvals = multipletests(ListofPs, method='bonferroni')
+    print('\nAdjusted p-values after Bonferroni:')
+    print(adjust_pvals) 
 
 
 
@@ -477,7 +482,7 @@ if __name__ == "__main__":
 #        nx.draw_networkx_edges(Net, pos, edgelist=esmall, width=6, alpha=0.5, edge_color='b', style='dashed')
 #        nx.draw_networkx_labels(G, pos, font_size=20, font_family='sans-serif')
 ##        nx.draw(Net,node_size=500, node_color=colormap,with_labels=True)
-        plt.show()
+    plt.show()
 
         # test regions, binomial and hypergeometric
         #BinomDict = binom_test_regions(RegionsDict, Nodelist, SigDict, siglvl=0.05)
