@@ -1,7 +1,12 @@
 #!usr/env/bin/ python3
 """
-combination.py: takes in a list of file names, 
-makes another list with all dual combinations
+combination.py: 
+
+Reads in file with list of file names,  
+Outputs another file  with all n-combinations of original files,
+one combination per line.
+
+Useful for preparing protein pdb file input for pair-wise contact calculation.
 
 python3 combination.py [listoffiles] [combnum] [outputfile] [outpath]
 
@@ -10,6 +15,7 @@ python3 combination.py [listoffiles] [combnum] [outputfile] [outpath]
 from sys import argv
 import itertools
 import os
+import argparse
 ## FUNCTIONS
 def get_list(infile):
     """
@@ -30,27 +36,34 @@ def combinate(listoffiles, combnum):
     return combinedlist
 
 def print_output(combinedlist, filename, outpath):
-    """
-    """
     filename = os.path.join(outpath,filename)
     outfile = open(filename, 'w+')
-    for line in combinedlist:
-        ent1 = line[0]
-        ent2 = line[1]
-        outfile.write(f'{ent1} {ent2}\n')
+    for item in combinedlist:
+        ent = " ".join(item)
+        outfile.write(f'{ent}\n')
     outfile.close()
 
-## MAIN
-if __name__ == "__main__":
-    if len(argv) != 5:
-        print('################################################################################################\n')
-        print('    Usage: python3 combination.py [filewithlistoffiles] [combi_num] [outfilename] [outpath]     \n')
-        print('################################################################################################\n')
+def parse_arguments():
+    parser = argparse.ArgumentParser(usage="python3 %(prog)s [-h] <inputfile> <N> <outfile> <outpath",
+                                     description="Returns file of N-wise combinations of input file list.")
+    parser.add_argument("inputfile", help="One column text file of filenames", type=str)
+    parser.add_argument("N", help="Combination number, e.g. 2 gives pair-wise combinations", type=int)
+    parser.add_argument("outfile", help="Name of outputfile", type=str)
+    parser.add_argument("outpath", help="Path to output outfile", type=str)
+    args = parser.parse_args()
+    return args
+
+def main():
+    Args = parse_arguments()
+    FileList = get_list(Args.inputfile)
+    if Args.N == 1:
+        print(f'Combination of 1 is just your input file: {Args.inputfile}')
+    elif Args.N > len(FileList):
+        print(f'Combination number: {Args.N} cannot be larger than number of files inputted: {len(FileList)}')
     else:
-        inputfile = argv[1]
-        combnum = int(argv[2])
-        outputfile = argv[3]
-        outpath = argv[4]
-        FileList = get_list(inputfile)
-        CombList = combinate(FileList,combnum)
-        print_output(CombList,outputfile,outpath)
+        CombList = combinate(FileList,Args.N)
+        print_output(CombList,Args.outfile,Args.outpath)
+    
+## MAIN
+if __name__=="__main__":
+    main()
