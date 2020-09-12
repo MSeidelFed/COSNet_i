@@ -31,7 +31,7 @@ $ module add devel/Python-3.6.5
 
 Otherwise make sure you have Python 3 installed. Additionally, we use the Biopython PDB package to handle PDB files. Installation info can be found [here](https://biopython.org/wiki/Download).
 
-### Extract PDB files from mmCIF files
+## Extract PDB files from mmCIF files
 
 Many multiprotein complexes are given in mmCIF-formatted files. Here is how to use the command line (linux-like) to extract PDBs from mmCIF files, which we save into the trial directory.
 _e.g.:_
@@ -49,7 +49,7 @@ $ python3 Python_Modules/split_cif_by_entity.py Data/4v7e.cif trial/
 ```
 
 The PDB objects will be saved as individual files in the `trial` directory.
-### Generate FASTA files (optional)
+## Generate FASTA files (optional)
 
 This module is optional within the entire workflow and is meant as a quality control step in order to align the monomer sequences of the constituent molecular entities in the analyzed multimeric complex.
 _e.g.:_
@@ -67,7 +67,7 @@ $ python3 Python_Modules/extract_sequence.py trial/4v7e_L30_60S_ribosomal.pdb Da
 
 The function will output the sequences of the mmCIF object according to the entity number (69 in the example) and type (protein in the example), it will only consider the sequences a match if every single monomer is listed in both strings in which case no further message will be displayed, otherwise a warning message will tell the user that the sequences are not equal and a visual verification becomes necessary.
 
-### Reindex PDBs (optional)
+## Reindex PDBs (optional)
 
 The residues column inside PDBs can be reindexed (sequential incrementation) if there are inconsistencies in numbering to prevent holes in structures, or if for any other reason the user wishes to start from a certain index.
 _e.g.:_
@@ -100,7 +100,7 @@ $ python3 Python_Modules/reindex_pdb.py 1 trial/4v7e_L30_60S_ribosomal.pdb trial
 
 After iterating through every object the output, reindexed PDBs should be in the trial_redxd folder. At this point you may select which object to include to fit the distance network. In our exemplary case we only used the protein PDBs to fit the network, hiding the remaining PDB files in a separate folder.
 
-### Fit the distance network
+## Fit the distance network
 
 Generate file with the combinations of names that will be used to calculate distance matrices between entities
 _e.g.:_
@@ -141,7 +141,7 @@ Please note that the function expects a naming scheme of the form XX_XX.pdb, whi
 The resulting distance matrices can be imported into R for visualization.
 
 
-### Threshold selection and transit probability
+## Threshold selection and transit probability
 
 Select a threshold to define a contact and build a contact matrix based on the distances. Plus output the number of atoms that are in contact to later on define the percentage of coverage and transit probability.
 _e.g.:_
@@ -173,7 +173,7 @@ The first two columns of Output 1 are used to fit the network, and in order to p
 $ awk '{print $1" "$2" "$3}' trial_contacts/summary_contacts_t8.txt > Results/edges_with_weights_4v7e_t8.txt
 ```
 
-### Random Walk and Fisher Exact Test
+## Random Walk and Fisher Exact Test
 
 The user must input a significances file for the hypergeometric or Fisher exact test with the same protein identifiers as those in the edge list and binary calls where 1 is significant for condition X and 0 is not significant, both columns must be separated by a space " ". The module allows repeated protein identifiers, or in other words, multiple significances per identifier in separate lines. This feature is meant to cope with paralogs within protein families, which are characteristic of multiprotein complexes. The example output is listed below:
 _e.g.:_
@@ -254,7 +254,7 @@ _given per region, in order_
 2. Significances array ([1.        , 1.        , 0.01620773, 1.        , 1.        , 1.        , 0.0031839 , 1.        , 1.        , 1.        ,  1.        , 0.05199515, 1.        , 1.        ])
 
 
-### Network drawing and highlight of specific regions
+## Network drawing and highlight of specific regions
 
 In order to color nodes, the following script allows users to map the subunit belonging of each node in the source and target columns, plus an optional argument is to select all the nodes that interact after the random walk with an specific protein of interest.
 _e.g.:_
