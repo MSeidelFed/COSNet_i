@@ -180,7 +180,7 @@ _e.g.:_
 
 _Usage:_ ```python3 intcryomics.py <filewithedgelist> <sigfile> <walklength> <iterationnum>```
 ```bash
-$ python3 Python_Modules/intcryomics.py edges_with_weights.txt Data/significance_file 20 10 > Results/IntCryOmics_4v7e_t20.txt
+$ python3 Python_Modules/intcryomics.py edges_with_weights.txt Data/significance_file 20 10 > Results/IntCryOmics_4v7e_t8.txt
 ```
 
 ### List of nodes
@@ -253,4 +253,23 @@ _given per region, in order_
 
 2. Significances array ([1.        , 1.        , 0.01620773, 1.        , 1.        , 1.        , 0.0031839 , 1.        , 1.        , 1.        ,  1.        , 0.05199515, 1.        , 1.        ])
 
+
+### Network drawing and highlight of specific regions
+
+In order to color nodes, the following script allows users to map the subunit belonging of each node in the source and target columns, plus an optional argument is to select all the nodes that interact after the random walk with an specific protein of interest.
+_e.g.:_
+
+_Usage:_ ```python3 Pimp_My_Network.py <Names_file> [Intcryomics_file] [protein_ID] ```
+```bash
+
+## names file
+ls Results/edges* > Network_names_file.txt
+
+## IntCryOmics names file
+ls Results/IntCryOmics_* > IntCryOmics_names_file.txt
+
+$ python3 Python_Modules/Pimp_My_Network.py Network_names_file.txt IntCryOmics_names_file.txt eL39
+```
+
+If an IntCryOmics names file and a protein identifier are not given, the nodes will be named based on the subunit they belong to, either SSU or LSU. This procedure generates as outcome text files with a network structure that can be then visualized. The following is an example that was visualized in [Cytoscape](https://cytoscape.org/)
 
