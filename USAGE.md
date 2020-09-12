@@ -259,7 +259,7 @@ _given per region, in order_
 In order to color nodes, the following script allows users to map the subunit belonging of each node in the source and target columns, plus an optional argument is to select all the nodes that interact after the random walk with an specific protein of interest.
 _e.g.:_
 
-_Usage:_ ```python3 Pimp_My_Network.py <Names_file> [Intcryomics_file] [protein_ID] ```
+_Usage:_ ```python3 pimp_my_network.py <Names_file> [Intcryomics_file] [protein_ID] ```
 ```bash
 
 ## names file
