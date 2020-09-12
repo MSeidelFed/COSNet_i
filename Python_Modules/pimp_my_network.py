@@ -1,8 +1,8 @@
 #!usr/env/bin/ python3
 """
-Pimp_My_Network.py:
+pimp_my_network.py:
 
-python3 Pimp_My_Function.py 
+python3 pimp_my_network.py 
 
 """
 ## IMPORTS
@@ -230,7 +230,7 @@ if __name__ == "__main__":
 
     else:
         print('################################################################################################\n')
-        print('    Usage: python3 Pimp_My_Network.py [Names_file] [Intcryomics_file] [protein_ID]    \n')
+        print('    Usage: python3 pimp_my_network.py [Names_file] [Intcryomics_file] [protein_ID]    \n')
         print('################################################################################################\n')
 
 
