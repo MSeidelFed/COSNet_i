@@ -286,6 +286,8 @@ _given per region, in order_
 2. Significances array: [1.00000000e+00, 1.00000000e+00, 4.90000329e-04, 1.00000000e+00, 1.00000000e+00, 5.79336229e-01, 1.00000000e+00, 1.00000000e+00, 1.00000000e+00, 1.00000000e+00, 1.00000000e+00]
 
 
+_Significantly modulated region_ ![6snt](images/significance_file_6snt_depleted_270°.png)
+
 ## Network drawing and highlight of specific regions
 
 In order to color nodes, the following script allows users to map the subunit belonging of each node in the source and target columns, plus an optional argument is to select all the nodes that interact after the random walk with an specific protein of interest.
@@ -306,8 +308,7 @@ $ python3 Python_Modules/pimp_my_network.py Network_names_file.txt IntCryOmics_n
 If an IntCryOmics names file and a protein identifier are not given, the nodes will be named based on the subunit they belong to, either SSU or LSU. This procedure generates as outcome text files with a network structure that can be then visualized. The following is an example that was visualized in [Cytoscape](https://cytoscape.org/) using the protein eL39 as an example to follow the polypeptide exit tunnel (PET) region at different distance thresholds:
 
 
-_t_ = 5Å ![4v7e_t5](images/out2edges_with_weights_4v7e_t5.txt.png)
-_t_ = 8Å ![4v7e_t8](images/out2edges_with_weights_4v7e_t8.txt.png)
-_t_ = 12Å ![4v7e_t12](images/out2edges_with_weights_4v7e_t12.txt.png)
-_t_ = 20Å ![4v7e_t20](images/out2edges_with_weights_4v7e_t20.txt.png)
+_Optimized yeast network_![6snt_t12](images/out2edges_with_weights_6snt_t12.png)
+_Optimized rabbit network_ ![6gz5_t12](images/out2edges_with_weights_6gz5_t12.png)
+
 
