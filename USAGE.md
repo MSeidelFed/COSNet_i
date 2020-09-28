@@ -1,7 +1,7 @@
 # IntCryOmics USAGE.md
 This is the usage file for the integration of omics relative changes into Cryo-EM based randomly sampled interaction networks of multiprotein complexes. The project is composed of independent components, written as python scripts (found in [Python_Modules](https://github.com/MSeidelFed/IntCryOmics/tree/master/Python_Modules)), which can be run in batch with bash scripts (found in [Batch_files](https://github.com/MSeidelFed/IntCryOmics/tree/master/Batch_files)). 
 
-Here we document the usage of the various modules, with an example using the wheat ribosomal protein complex, with rRNA removed (PDB ID: [4v7e](https://www.rcsb.org/structure/4v7e)).
+Here we document the usage of the various modules, with an example using the yeast and rabbit ribosomal protein complexes, with rRNA removed (PDB ID: [6snt](https://www.rcsb.org/structure/6SNT)) (PDB ID: [6gz5](https://www.rcsb.org/structure/6GZ5)).
 
 ## Usage
 
