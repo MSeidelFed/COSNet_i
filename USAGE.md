@@ -1,7 +1,7 @@
 # IntCryOmics USAGE.md
 This is the usage file for the integration of omics relative changes into Cryo-EM based randomly sampled interaction networks of multiprotein complexes. The project is composed of independent components, written as python scripts (found in [Python_Modules](https://github.com/MSeidelFed/IntCryOmics/tree/master/Python_Modules)), which can be run in batch with bash scripts (found in [Batch_files](https://github.com/MSeidelFed/IntCryOmics/tree/master/Batch_files)). 
 
-Here we document the usage of the various modules, with an example using the yeast and rabbit ribosomal protein complexes, with rRNA removed (*Saccharomyces cerevisiae* PDB ID: [6snt](https://www.rcsb.org/structure/6SNT)) (*Oryctolagus cuniculus* PDB ID: [6gz5](https://www.rcsb.org/structure/6GZ5)) and proteomic abundances from Shi et al., (2017) [mammalian](https://www.sciencedirect.com/science/article/pii/S1097276517303611) and Slavov et al., (2015) [yeast](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4644233/)
+Here we document the usage of the various modules, with an example using the yeast and rabbit ribosomal protein complexes, with rRNA removed (*Saccharomyces cerevisiae* PDB ID: [6snt](https://www.rcsb.org/structure/6SNT)) (*Oryctolagus cuniculus* PDB ID: [6gz5](https://www.rcsb.org/structure/6GZ5)) and proteomic abundances from Shi et al., (2017) [mammalian](https://www.sciencedirect.com/science/article/pii/S1097276517303611) and Slavov et al., (2015) [yeast](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4644233/).
 
 
 ## Usage
