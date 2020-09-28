@@ -308,7 +308,7 @@ $ python3 Python_Modules/pimp_my_network.py Network_names_file.txt IntCryOmics_n
 If an IntCryOmics names file and a protein identifier are not given, the nodes will be named based on the subunit they belong to, either SSU or LSU. This procedure generates as outcome text files with a network structure that can be then visualized. The following is an example that was visualized in [Cytoscape](https://cytoscape.org/) using the protein eL39 as an example to follow the polypeptide exit tunnel (PET) region at different distance thresholds:
 
 
-_Optimized yeast network_![6snt_t12](images/out2edges_with_weights_6snt_t12.png)
-_Optimized rabbit network_ ![6gz5_t12](images/out2edges_with_weights_6gz5_t12.png)
+_Optimized yeast network_![6snt_t12](images/outedges_with_weights_6snt_t12.png)
+_Optimized rabbit network_ ![6gz5_t12](images/outedges_with_weights_6gz5_t12.png)
 
 
