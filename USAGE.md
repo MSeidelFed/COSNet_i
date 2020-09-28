@@ -255,15 +255,25 @@ _i.e., smallest set that spans the entire node space, gives preference to larger
 _i.e., most visited nodes during the random walks starting from the first node_
 
 Region 0:	['eL19', 'uS12', 'eS7', 'uS17', 'eS8', 'eL34', 'eS21', 'eL27', 'eL30', 'eS27', 'uS2', 'uS4', 'uS5', 'eS4', 'eS30', 'uS15']
+
 Region 1:	['eL39', 'eL20', 'eL21', 'uL24', 'eL37', 'uL29', 'uL14', 'uL30', 'uL4', 'eL8', 'eL28', 'eL36', 'uL13', 'uL15', 'uL18']
+
 Region 2:	['uS10', 'eS1', 'uS14', 'uS3', 'eS19', 'uS13', 'uS7', 'uS9', 'eS26', 'uS11', 'eS25', 'eS28']
+
 Region 3:	['uL22', 'eL6', 'eL20', 'eL33', 'uL14', 'uL16', 'uL4', 'uL6', 'eL24', 'uL3', 'eL28', 'eL32', 'uL13', 'uL18']
+
 Region 4:	['eL6', 'eL20', 'eL21', 'uL10', 'uL14', 'uL16', 'uL30', 'uL4', 'uL11', 'eL29', 'uL5', 'uS13', 'uL18']
+
 Region 5:	['uS10', 'eS10', 'eS12', 'uS14', 'uS3', 'eS31', 'eS17', 'uS7', 'uS9']
+
 Region 6:	['eL20', 'uL14', 'uL16', 'eL24', 'eS6', 'uL23', 'uL3', 'eS24', 'eS4']
+
 Region 7:	['eL34', 'eL27', 'eL30', 'eL8', 'uL2', 'eS27', 'uS5', 'uL15', 'eL43', 'uS15']
+
 Region 8:	['uS8', 'eL20', 'eL21', 'uL11', 'uL5', 'eS19', 'uS13', 'uS7', 'uS9', 'eL42', 'uL13', 'uL15', 'eS25']
+
 Region 9:	['eL6', 'eL20', 'eL21', 'eL33', 'eL40', 'uL14', 'uL16', 'uL30', 'uL4', 'uL6', 'uL5', 'eL24', 'uL3']
+
 Region 10:	['eL31', 'uL22', 'eL6', 'eL20', 'eL21', 'eL33', 'uL14', 'uL16', 'uL6', 'eL32']
 
 
