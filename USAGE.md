@@ -31,7 +31,25 @@ $ module add devel/Python-3.6.5
 
 Otherwise make sure you have Python 3 installed. Additionally, we use the Biopython PDB package to handle PDB files. Installation info can be found [here](https://biopython.org/wiki/Download).
 
-## Extract PDB files from mmCIF files
+## mmCIF/PDBx files
+
+The following examples have been developed including, additionally to the two aforementiones structures, the plant cytosolic ribosome structure [4v7e](https://www.rcsb.org/structure/4V7E)
+
+### Check the quality of mmCIF files
+
+_Usage:_ ```python3 check_cif_completeness.py [-h] <ciffile> <outpath>``
+
+```bash
+$ python3 Python_Modules/check_cif_completeness.py  Data/4v7e.cif .
+
+$ python3 Python_Modules/check_cif_completeness.py  Data/6snt.cif .
+
+$ python3 Python_Modules/check_cif_completeness.py  Data/6gz5.cif .
+```
+
+The function outputs in the same directory where the mmCIF is stored, in this case Data. The output files contain an assesment of the percentage covered by each protein modelled onto the structure.
+
+### Extract PDB files from mmCIF files
 
 Many multiprotein complexes are given in mmCIF-formatted files. Here is how to use the command line (linux-like) to extract PDBs from mmCIF files, which we save into the trial directory.
 _e.g.:_
