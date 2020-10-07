@@ -37,17 +37,19 @@ The following examples have been developed including, additionally to the two af
 
 ### Check the quality of mmCIF files
 
+The function checks the percentage of coverage that each modelled protein sequence has as compared to its respective FASTA sequence.
+
 _Usage:_ ```python3 check_cif_completeness.py [-h] <ciffile> <outpath>``
 
 ```bash
-$ python3 Python_Modules/check_cif_completeness.py  Data/4v7e.cif .
+$ python3 Python_Modules/check_cif_completeness.py  Data/4v7e.cif . > assesment_4v7e.txt
 
-$ python3 Python_Modules/check_cif_completeness.py  Data/6snt.cif .
+$ python3 Python_Modules/check_cif_completeness.py  Data/6snt.cif . > assesment_6snt.txt
 
-$ python3 Python_Modules/check_cif_completeness.py  Data/6gz5.cif .
+$ python3 Python_Modules/check_cif_completeness.py  Data/6gz5.cif . > assesment_6gz5.txt
 ```
 
-The function outputs in the same directory where the mmCIF is stored, in this case Data. The output files contain an assesment of the percentage covered by each protein modelled onto the structure.
+The function outputs the ID percentage in the same directory where the mmCIF is stored, in this case Data. To obtain the full output files containing an assesment of the percentage covered by each protein modelled onto the structure the user must pipe results into a txt file as outlined in the examples.
 
 ### Extract PDB files from mmCIF files
 
