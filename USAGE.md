@@ -33,7 +33,7 @@ Otherwise make sure you have Python 3 installed. Additionally, we use the Biopyt
 
 ## mmCIF/PDBx files
 
-The following examples have been developed including, additionally to the two aforementiones structures, the plant cytosolic ribosome structure [4v7e](https://www.rcsb.org/structure/4V7E)
+The following examples have been developed including, additionally to the two aforementioned structures, the plant cytosolic ribosome structure [4v7e](https://www.rcsb.org/structure/4V7E).
 
 ### Check the quality of mmCIF files
 
