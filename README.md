@@ -5,11 +5,11 @@ IntCryOmics is a collection of scripts to randomly select spatial neighborhoods 
 
 The repo follows this file structure, in order of relevance:
 
-1. [Usage Instructions](https://github.com/MSeidelFed/IntCryOmics_Package/blob/master/USAGE.md): _detailed and recommended usage of python and bash script code to run the analysis step-by-step._
-2. [Data](https://github.com/MSeidelFed/IntCryOmics_Package/tree/master/Data): _sample data used in the original project from which the usage examples are based. Use  this to reproduce our results._
-3. [Python_Modules](https://github.com/MSeidelFed/IntCryOmics_Package/tree/master/Python_Modules): _collection of python scripts to carry out various steps of the analysis._
-4. [Batch_files](https://github.com/MSeidelFed/IntCryOmics_Package/tree/master/Batch_files): _collection of bash scripts to run certain parts of the workflow in batch, iterating over a large number of files._
-5. [Images](https://github.com/MSeidelFed/IntCryOmics_Package/tree/master/images): _some figures relevant to the repo_
+1. [Usage Instructions](https://github.com/MSeidelFed/Protein-Complex-Partitioner/blob/master/USAGE.md): _detailed and recommended usage of python and bash script code to run the analysis step-by-step._
+2. [Data](https://github.com/MSeidelFed/Protein-Complex-Partitioner/tree/master/Data): _sample data used in the original project from which the usage examples are based. Use  this to reproduce our results._
+3. [Python_Modules](https://github.com/MSeidelFed/Protein-Complex-Partitioner/tree/master/Python_Modules): _collection of python scripts to carry out various steps of the analysis._
+4. [Batch_files](https://github.com/MSeidelFed/Protein-Complex-Partitioner/tree/master/Batch_files): _collection of bash scripts to run certain parts of the workflow in batch, iterating over a large number of files._
+5. [Images](https://github.com/MSeidelFed/Protein-Complex-Partitioner/tree/master/images): _some figures relevant to the repo_
 
 Below is an illustration of the workflow. Current work is in progress to develop the modules further into one connected pipeline. 
 
@@ -22,7 +22,7 @@ Below is an illustration of the workflow. Current work is in progress to develop
 
 Clone the repo:
 ```
-git clone https://github.com/MSeidelFed/IntCryOmics_Package.git
+git clone https://github.com/MSeidelFed/Protein-Complex-Partitioner.git
 ```
 Create a virtual environment. This step is optional
 ```
