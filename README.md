@@ -17,6 +17,8 @@ Below is an illustration of the workflow. Current work is in progress to develop
 
 ![Workflow](images/PCP_workflow.png)
 
+mmCIF icon was taken from [IUCr](http://ww1.iucr.org/)
+
 
 ## Installation
 
