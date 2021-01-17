@@ -15,7 +15,7 @@ Below is an illustration of the workflow. Current work is in progress to develop
 
 **Workflow**
 
-![Workflow](images/intcryomics_workflow.png)
+![Workflow](images/PCP_workflow.png)
 
 
 ## Installation
