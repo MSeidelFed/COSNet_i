@@ -16,6 +16,7 @@ of its atoms, for example, and same goes for a nucleotide)
 ###### IMPORTS ######
 from sys import argv
 from Bio.PDB import PDBParser
+from pathlib import Path
 import numpy as np
 import os
 import argparse
@@ -30,7 +31,10 @@ def get_struct(PDBfilepath):
     PDBfile = os.path.basename(PDBfilepath)
     struct_id_elems = PDBfile.split("_")
     struct_id = struct_id_elems[0]
-    ent_id = struct_id_elems[1].split(".")[0]
+    if len(struct_id_elems)!= 2:
+        ent_id = PDBfile.split('.')[0]
+    else:
+        ent_id = struct_id_elems[1].split(".")[0]
 
     structure = parser.get_structure(ent_id, PDBfilepath)
     residues = structure.get_residues()
@@ -91,6 +95,10 @@ def parse_arguments():
 if __name__ == "__main__":
     #usage
     Args = parse_arguments()
+    if Args.outpath=='.':
+        outpath=Path.cwd()
+    else:
+        outpath=Path(Args.outpath)
     #parse out structures and info of both files
     Ent1Struct, Struct1ID, Ent1ID, Residues1 = get_struct(Args.pdbfile1)
     Ent2Struct, Struct2ID, Ent2ID, Residues2 = get_struct(Args.pdbfile2)
@@ -112,8 +120,8 @@ if __name__ == "__main__":
     if Struct1ID != Struct2ID:
         np.savetxt('dist_mtx_{}_{}.csv'.format(Struct1ID,Struct2ID), DistMtx, delimiter=",")
         outfile = f'dist_mtx_{Struct1ID}_{Struct2ID}.csv'
-        os.rename(outfile, os.path.join(Args.outpath, outfile))
+        os.rename(outfile, os.path.join(outpath, outfile))
     else:
         np.savetxt('dist_mtx_{}_{}.csv'.format(Ent1ID,Ent2ID), DistMtx, delimiter=",")
         outfile = f'dist_mtx_{Ent1ID}_{Ent2ID}.csv'
-        os.rename(outfile, os.path.join(Args.outpath, outfile))
+        os.rename(outfile, os.path.join(outpath, outfile))
