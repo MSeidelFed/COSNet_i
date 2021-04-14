@@ -17,9 +17,6 @@ import subprocess
 from pathlib import Path
 
 ### FUNCTIONS
-def getpdbs_in_dir(pathtodir):
-    pass
-
 def iterate_run_calcdist(listoffiletuples, pdbpath, outpath):
     counter=1
     for filetuple in listoffiletuples:
