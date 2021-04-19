@@ -1,15 +1,6 @@
 numpy==1.18.1
 biopython==1.78
-#itertools
 os-sys==2.1.4
-#glob
-argparse==1.4.0
 scipy==1.5.2
-#operator
 networkx==2.5
 matplotlib==3.3.1
-#collections
-#random
-#math
-#pickle
-pathlib==1.0.1
