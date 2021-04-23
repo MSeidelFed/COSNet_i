@@ -8,12 +8,12 @@ This script is a command-line interface to make n-combinations of
 files. It is useful for preparing protein pdb file input for pair-wise
 contact calculation. 
 """
+
 from sys import argv
 from pathlib import Path
 import itertools
-import os
 import argparse
-## FUNCTIONS
+
 def get_list_of_files(infile):
     """
     Makes list of file names 
@@ -65,18 +65,13 @@ def print_output(combinedlist, filename, outpath):
         name of file to write file combinations
     outpath: pathlib.PosixPath
         path to output file
-
-    Returns
-    -------
-    None
     """
-    filename = os.path.join(outpath,filename)
+    filename = outpath.joinpath(filename)
     outfile = open(filename, 'w+')
     for item in combinedlist:
         ent = " ".join(item)
         outfile.write(f'{ent}\n')
     outfile.close()
-    return
 
 def parse_arguments():
     parser = argparse.ArgumentParser(usage="python3 %(prog)s [-h] inputfile N outfile outpath",
@@ -103,6 +98,5 @@ def main():
             CombList = combinate(FileList,Args.N)
             print_output(CombList,Path(Args.outfile),Path(Args.outpath))
     
-## MAIN
 if __name__=="__main__":
     main()

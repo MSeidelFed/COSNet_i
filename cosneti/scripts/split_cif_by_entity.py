@@ -8,12 +8,11 @@ This script is a command-line interface to extract and
 save structural data for all entities from a mmCIF file. 
 """
 
-from Bio.PDB.MMCIFParser import MMCIFParser
-from Bio.PDB.MMCIF2Dict import MMCIF2Dict
 from collections import Counter
 from pathlib import Path
 import argparse
-import os
+
+from Bio.PDB.MMCIF2Dict import MMCIF2Dict
 
 def lower_upper_idx(EntityAtomIDs):
     """
@@ -62,9 +61,6 @@ def writeout_struct_data(ObjName, IDxDict, NamesList, CIFDict, address):
         parsed dict of cif info
     address: str
 
-    Returns
-    -------
-    None
     """
     print(f'Output PDBs found in: {address}\n')
 
@@ -108,7 +104,6 @@ def writeout_struct_data(ObjName, IDxDict, NamesList, CIFDict, address):
                 structfile.write('\n')
         structfile.write('\nTER')
         structfile.close()
-    return
 
 def check_entityname(entnamelist):
     """
@@ -134,7 +129,6 @@ def check_entityname(entnamelist):
             edited_name = ''.join(edited_name)
             entnamelist[i] = edited_name
     return entnamelist
-          
 
 def parse_arguments():
     parser = argparse.ArgumentParser(usage="python3 %(prog)s [-h] CIFfile outpath",
@@ -143,13 +137,13 @@ def parse_arguments():
     parser.add_argument("outpath",help="Output path", type=str)
     args = parser.parse_args()
     return args
-    
+
 def main():
     # get arguments
     Args = parse_arguments()
 
     # read in data file from command line
-    pathtociffile = Path(Args.CIFfile) #pathlib.PosixPath
+    pathtociffile = Path(Args.CIFfile) 
     obj_name = pathtociffile.stem
     address = Path(Args.outpath)
 
@@ -157,18 +151,17 @@ def main():
         raise Exception('Incorrect path specifications in input. Verify!')
     else:
         # save contents as a dictionary
-        cif_dict = MMCIF2Dict(pathtociffile) #Bio.PDB.MMCIF2Dict.MMCIF2Dict
+        cif_dict = MMCIF2Dict(pathtociffile) 
 
         # get lists of identifiers and entities
-        ent_id = cif_dict["_entity_poly.entity_id"] #list
-        ent_name = cif_dict["_entity.pdbx_description"] #list
-        new_ent_name = check_entityname(ent_name) #list
-        ent_atom_ids = cif_dict["_atom_site.label_entity_id"] #list
+        ent_id = cif_dict["_entity_poly.entity_id"] 
+        ent_name = cif_dict["_entity.pdbx_description"] 
+        new_ent_name = check_entityname(ent_name) 
+        ent_atom_ids = cif_dict["_atom_site.label_entity_id"] 
 
         # get dictionary of indices per entity indicating corresponding rows of the atomic data 
         IDxDict = lower_upper_idx(ent_atom_ids)
         writeout_struct_data(obj_name, IDxDict, new_ent_name, cif_dict, address)
     
-## MAIN
 if __name__ == "__main__":
     main()
