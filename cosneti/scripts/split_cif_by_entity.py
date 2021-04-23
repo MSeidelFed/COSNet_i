@@ -2,7 +2,7 @@
 """
 [split_cif_by_entity.py]
 
-USAGE: python3 split_cif_by_entity.py <inputfile> <pathtooutput>
+USAGE: python3 split_cif_by_entity.py inputfile pathtooutput
 
 This script is a command-line interface to extract and
 save structural data for all entities from a mmCIF file. 
@@ -137,7 +137,7 @@ def check_entityname(entnamelist):
           
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(usage="python3 %(prog)s [-h] <pathto/CIFfile> <outpath>",
+    parser = argparse.ArgumentParser(usage="python3 %(prog)s [-h] CIFfile outpath",
                                      description="Splits CIF into separate PDB files per entity")
     parser.add_argument("CIFfile", help="CIF file input to be split", type=str)
     parser.add_argument("outpath",help="Output path", type=str)
