@@ -1,38 +1,87 @@
-#!/usr/env/bin/python3
+#!/usr/env/bin/ python3
 """
-[contacts_from_dist.py]: Checks if values in a distance matrix are under
-a certain threshold value, if such values exist, prints them out into a separate file
-with indices and distances
+[contacts_from_dist.py]
 
-USAGE: python3 contacts_from_dist.py <filewithcsvs> <thresholdvalue>
+This script is a command-line interface to
+find contacting residues under a distance threshold and 
+print out summary info to the console.
+Any contacts are saved in separate data files.
+
+It can take either one distance matrix csv file as input, or 
+a text file listing distance matrix csv files, one per line. 
+Paths to input and output must be specified.
+
+USAGE: python3 contacts_from_dist.py threshold inputfile pathtocsvs pathtopdbs outpath
 """
-## IMPORTS
-from Bio.PDB import PDBParser
-from sys import argv
-import numpy as np
+
 import os
 import glob
 import argparse
-## FUNCTIONS
-def get_files_list(inputfile):
-    """ """
-    files_list = []
-    with open(inputfile, 'r') as f:
-        for line in f:
-            files_list.append(line.strip())
+from pathlib import Path
 
-    return files_list
+from Bio.PDB import PDBParser
+import numpy as np
+
+def get_list_of_files(infile):
+    """
+    Makes list of file names 
+
+    Parameters
+    ----------
+    infile: pathlib.PosixPath
+
+    Returns
+    -------
+    filelist: list
+        list of file names
+    """
+    filelist = []
+    with open(infile) as f:
+        for line in f:
+            filelist.append(line.strip())
+
+    return filelist
 
 def read_dist_mtx(inputfile):
-    """Reads in csv file as np array"""
+    """Reads in csv file as np array
+
+    Parameters
+    ----------
+    inputfile: str
+        path to inputfile
+
+    Returns
+    -------
+    dist_mtx: numpy.ndarray
+        matrix of inter-residue distances
+    """
     dist_mtx = np.loadtxt(inputfile, dtype=float, delimiter=',')
     return dist_mtx
 
 def find_contact_idx(dist_mtx, ent1name, ent2name, noncontacts, contacts, threshold, resultspath):
-    """Find indices and distances below threshold
-       outputs to a file if contacts exist otherwise
-       adds to non_contact file
+    """Find indices for residues with distances below contact threshold.
+       Saves existing contacts to a file, otherwise adds proteins to non_contact file.
        Returns two lists of tuples, where contacts have a tuple within a tuple!
+
+    Parameters
+    ----------
+    dist_mtx: numpy.ndarray
+    ent1name: str
+        name of first entity (usually prot1)
+    ent2name: str
+        name of first entity (usually prot2)
+    noncontacts: list
+        list of tuples of prots without contacts, e.g. [('prot1', 'prot2'),...]
+    contacts: list
+        list of tuples of prots with contacts and number of contacts e.g. [(('prot2', 'prot3'), 3),...]
+    threshold: int
+        distance threshold in Å for contacts
+    resultspath: pathlib.PosixPath
+
+    Returns
+    -------
+    noncontacts: list
+    contacts: list
     """
     pair = (ent1name, ent2name)
     if np.all(dist_mtx >= int(threshold)):
@@ -53,6 +102,19 @@ def find_contact_idx(dist_mtx, ent1name, ent2name, noncontacts, contacts, thresh
 
 def get_structure(protname, datapath):
     """
+    Parses in PDB structure, asks for user input
+    if multiple options exist.
+
+    Parameters
+    ----------
+    protname: str
+        name for your protein, used to search for pdbs
+    datapath: pathlib.PosixPath
+        path to dir with pdb files
+
+    Returns
+    -------
+    structure: Bio.PDB.Structure.Structure
     """
     parser = PDBParser(PERMISSIVE=1)
     pdblist = glob.glob(f'{datapath}/*{protname}[_.]*.pdb') ###
@@ -78,8 +140,25 @@ def get_structure(protname, datapath):
     return structure 
     
 def count_atoms_under_thresh(struct1, struct2, ent1, ent2, threshold, resultspath):
-    """Takes in list of interacting residues and counts number of atoms per residue
-       that are falling under the threshold value
+    """
+    Grabs any contact files between ent1 and ent2.
+    Compares two structures.
+    Counts number of atoms per residue that are falling under the threshold value.
+    Also counts number of connections ('links' between atoms) under this threshold.
+
+    Parameters
+    ----------
+    struct1: Bio.PDB.Structure.Structure
+    struct2: Bio.PDB.Structure.Structure
+    ent1: str
+    ent2: str
+    threshold: int
+    resultspath: pathlib.PosixPath
+
+    Returns
+    -------
+    per_res_connections_count: list
+    per_res_atoms_count: list
     """
     contactfile = glob.glob(f'{resultspath}/contacts_t{threshold}_{ent1}_{ent2}[._]*')   ### 
     if not contactfile:
@@ -97,6 +176,7 @@ def count_atoms_under_thresh(struct1, struct2, ent1, ent2, threshold, resultspat
             resi_contactlist.append((resi1, resi2))
 
     struct1_id = get_model_chain_ids(struct1)
+    print(type(struct1_id))
     print(f'(model#, chainID) for {ent1}: {struct1_id}')
     struct2_id = get_model_chain_ids(struct2)
     print(f'(model#, chainID) for {ent2}: {struct2_id}')
@@ -131,11 +211,11 @@ def count_atoms_under_thresh(struct1, struct2, ent1, ent2, threshold, resultspat
                     opp_count = atomdict2[atom2_name] + 1
                     atomdict2[atom2_name] = atomdict2[atom2_name] + 1
             atomdict1[atom1_name] = per_atom_count
-        #print(f'Atom 1 Dict: {atomdict1}')
-        #print(f'Atom 2 Dict: {atomdict2}')
-        #print(f'Connections Per Residue: {per_res_count}')
+        print(f'Atom 1 Dict: {atomdict1}')
+        print(f'Atom 2 Dict: {atomdict2}')
+        print(f'Connections Per Residue: {per_res_count}')
         per_res_connections_count.append(per_res_count)
-        #print(f'List of connections per residue: {per_res_connections_count}')
+        print(f'List of connections per residue: {per_res_connections_count}')
         ct = 0
         for val in atomdict1.values():
             if val != 0:
@@ -148,7 +228,18 @@ def count_atoms_under_thresh(struct1, struct2, ent1, ent2, threshold, resultspat
     return per_res_connections_count, per_res_atoms_count
 
 def get_model_chain_ids(structure):
-    """ """
+    """ 
+    Extracts model and chain ids from structure object.
+
+    Parameters
+    ----------
+    structure: Bio.PDB.Structure.Structure
+
+    Returns
+    -------
+    struct_id: tuple
+        tuple of (modelid, chainid)
+    """
     modelnum = []
     chainid = []
     for model in structure:
@@ -160,7 +251,17 @@ def get_model_chain_ids(structure):
     return struct_id
             
 def print_summary_output(contact_list, summed_count_list, filename, resultspath):
-    """ """
+    """ 
+    Writes contact information to output files.
+
+    Parameters
+    ----------
+    contact_list: list
+    summed_count_list: list
+    filename: str
+    resultspath: pathlib.PosixPath
+        path to dir to write out files
+    """
     if contact_list:
         outfile = os.path.join(resultspath, filename)
         contactfile = open(outfile, 'w+')
@@ -174,7 +275,18 @@ def print_summary_output(contact_list, summed_count_list, filename, resultspath)
         return
 
 def append_count_info(per_res_count_list, total_atom_count_list, ent1name, ent2name, threshold, resultspath):
-    """ """
+    """
+    Writes atom and connection count info to 'full' version of contact files.
+
+    Parameters
+    ----------
+    per_res_count_list: list
+    total_atom_count_list: list
+    ent1name: str
+    ent2name: str
+    threshold: int
+    resultspath: pathlib.PosixPath
+    """
     infile = os.path.join(resultspath, f'contacts_t{threshold}_{ent1name}_{ent2name}.dat')
     outfile = os.path.join(resultspath, f'contacts_t{threshold}_{ent1name}_{ent2name}_full.dat')
     data = open(infile, 'r').readlines()
@@ -191,12 +303,12 @@ def append_count_info(per_res_count_list, total_atom_count_list, ent1name, ent2n
     return
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(usage="python3 %(prog)s [-h] <threshold> <pathto/input> <pathtocsvs> <pathtopdbs> <outpath>",
+    parser = argparse.ArgumentParser(usage="python3 %(prog)s [-h] threshold inputfile pathtocsvs pathtopdbs outpath",
                                      description="Finds residues in contact under a defined distance threshold")
     parser.add_argument("threshold", help="Value (angstroms) representing distance under which residues are in contact (normally 8)", type=int)
     parser.add_argument("inputfile", help="One CSV or a text file with list of CSV (distance matrices)", type=str)
-    parser.add_argument("pathtocsvs", help="Path to where CSVs are located", type=str)
-    parser.add_argument("pathtopdbs", help="Path to where PDBs are located", type=str)
+    parser.add_argument("pathtocsvs", help="Path to where dist matrix CSVs are located", type=str)
+    parser.add_argument("pathtopdbs", help="Path to where PDB structure files are located", type=str)
     parser.add_argument("outpath", help="Output path for contact files", type=str)
     args = parser.parse_args()
     return args
@@ -205,19 +317,22 @@ def parse_arguments():
 if __name__ == "__main__":
     # get arguments
     Args = parse_arguments()
-    threshold = Args.threshold
-    pathto_infile = Args.inputfile
-    infile = os.path.basename(pathto_infile)
+    threshold = int(Args.threshold)
+    pathtoinfile = Path(Args.inputfile)
+    infile = pathtoinfile.name
 
-    pathto_csvs = Args.pathtocsvs
-    pathto_pdbs = Args.pathtopdbs
-    output_path = Args.outpath
+    pathto_csvs = Path(Args.pathtocsvs)
+    pathto_pdbs = Path(Args.pathtopdbs)
+    output_path = Path(Args.outpath)
 
     # is input file one csv or a file listing csvs? 
-    if infile[-4:] != '.csv':
-        FilesList = get_files_list(pathto_infile)
+    if pathtoinfile.suffix != '.csv':
+        FilesList = get_list_of_files(pathtoinfile)
+        print(FilesList)
     else:
         FilesList = [infile]
+        print(FilesList)
+
 
     NonContactList = []
     ContactList = []
@@ -226,17 +341,18 @@ if __name__ == "__main__":
     for afile in FilesList:
         print('+++++++++++++++++++++++++++++++++++++')
         print(f'Distance File: {afile}')
+        # your dist mtx and pdb files need to have X_x.pdb, Y_y.pdb and dist_mtx_X_Y.csv format!
         fileparts = afile.split('_')
         ent1 = fileparts[2]
         ent2 = fileparts[3].split('.')[0]
         print(f'Comparing: {ent1} {ent2}')
         # Load data
-        filename = os.path.join(pathto_csvs, afile)
+        filename = pathto_csvs.joinpath(afile)
         print(filename)
         try:
             DistMtx = read_dist_mtx(filename)
         except: 
-            print(f'WARNING: {filename} not found in {pathto_csvs}')
+            raise FileNotFoundError(f'WARNING: {filename} not found in {pathto_csvs}')
             continue
         # Find contacts and output to respective files
         NonConList, ConList = find_contact_idx(DistMtx, ent1, ent2, NonContactList, ContactList, threshold, output_path)
@@ -250,6 +366,10 @@ if __name__ == "__main__":
             StructEnt2 = get_structure(ent2, pathto_pdbs)
             # Calculate atoms in contacts
             PerResCountList, PerResAtomCountList = count_atoms_under_thresh(StructEnt1, StructEnt2, ent1, ent2, threshold, output_path)
+            print(PerResCountList)
+            print(type(PerResCountList))
+            print(PerResAtomCountList)
+            print(type(PerResAtomCountList))
             # Print out where you are
             SummedCountList.append((sum(PerResCountList), sum(PerResAtomCountList)))
             append_count_info(PerResCountList, PerResAtomCountList, ent1, ent2, threshold, output_path)
