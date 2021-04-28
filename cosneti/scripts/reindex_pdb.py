@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """
-[reindex_pdb_residues.py]
+[reindex_pdb.py]
 
-Returns a reindexed pdb file from a given starting index.
+This script command line interface to reindex residues
+in a pdb file given a starting index.
+
+USAGE: python3 reindex_pdb.py startidx pdbfile outfile
 """
 ### IMPORTS
 from Bio.PDB import PDBParser
@@ -12,14 +15,36 @@ import argparse
 
 ### FUNCTIONS
 def parse_pdb(PDBfile):
-    """Parses PDB file, returns PDB object"""
+    """
+    Parses PDB file, returns PDB object
+    
+    Parameters
+    ----------
+    PDBfile: pathlib.PosixPath
+
+    Returns
+    -------
+    structobj: Bio.PDB.Structure.Structure
+    """
     name=PDBfile.name[:-4]
     p=PDBParser()
     struct = p.get_structure(name, PDBfile)
     return struct, name
 
 def reindex(structobj, startidx):
-    """Reindexes residues per chain per model"""
+    """
+    Reindexes residues per chain per model,
+    directly modifies structobj
+
+    Parameters
+    ----------
+    structobj: Bio.PDB.Structure.Structure
+    startidx: int
+
+    Returns
+    -------
+    structobj: Bio.PDB.Structure.Structure
+    """
     for model in structobj: 
         for chain in model:
             count = startidx

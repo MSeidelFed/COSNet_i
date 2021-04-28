@@ -1,18 +1,22 @@
 #!/usr/bin/env python3
 """
 [check_cif_completeness.py]
+
+This script is a command-line interface to summarise the completeness of
+the structures within a mmCIF file, by aligning the structural sequences
+with their reported canonical sequences, and calculating the percentage id.
+
+USAGE: python3 check_cif_completeness.py ciffile outpath
 """
 ### IMPORTS
-from Bio.PDB.MMCIFParser import MMCIFParser
-from Bio.PDB.MMCIF2Dict import MMCIF2Dict
-from Bio import SeqIO, pairwise2
-from Bio.pairwise2 import format_alignment
-from Bio.PDB import Selection
 from pathlib import Path
 import argparse
 
-import matplotlib.pyplot as plt
-import numpy as np
+from Bio.PDB.MMCIFParser import MMCIFParser
+from Bio.PDB.MMCIF2Dict import MMCIF2Dict
+from Bio import pairwise2
+from Bio.pairwise2 import format_alignment
+from Bio.PDB import Selection
 
 ### VARIABLES
 global THREE_TO_ONE
@@ -25,6 +29,23 @@ THREE_TO_ONE = {'ALA': 'A', 'ARG': 'R', 'ASN': 'N',
                 'TYR': 'Y', 'VAL': 'V'}
 ### FUNCTIONS
 def get_entity_seqs(CIFfile):
+    """
+    Extracts structural and canonical sequences from mmCIF file.
+
+    Parameters
+    ----------
+    CIFfile: pathlib.PosixPath
+        mmCIF input file
+
+    Returns
+    -------
+    iddict: dict
+        dict with names of entities
+    structseqdict: dict
+        dict with structural seqs
+    canseqdict: dict
+        dict with canonical seqs
+    """
     cifdict = MMCIF2Dict(CIFfile)
     parser = MMCIFParser()
     cifstruct = parser.get_structure("ribo", CIFfile)
@@ -63,6 +84,20 @@ def get_entity_seqs(CIFfile):
     return iddict, structseqdict, canseqdict
 
 def alignseqs(StructSeqD, CanSeqD, IDD):
+    """
+    Aligns structural sequences with canonical sequences
+
+    Parameters
+    ----------
+    StructSeqD: dict
+    CanSeqD: dict
+    IDD: dict
+
+    Returns
+    -------
+    pidlist: list
+        list of percentage ids in order of entities
+    """
     pidlist = []
     for key in StructSeqD.keys():
         if len(StructSeqD) == 1:
@@ -79,6 +114,19 @@ def alignseqs(StructSeqD, CanSeqD, IDD):
     return pidlist
 
 def calc_pid(seq1, seq2):
+    """
+    Calculates the percentage ID (still as a decimal)
+    between two sequences.
+
+    Parameters
+    ----------
+    seq1: str
+    seq2: str
+
+    Returns
+    -------
+    pid: float
+    """
     alnlen = len(seq1)
     identical = 0
     for i in range(0, len(seq1)):
@@ -97,11 +145,12 @@ def parse_cl_arguments():
 
 def main():
     Args = parse_cl_arguments()
-    IDDict, SSDict, CSDict = get_entity_seqs(Args.ciffile)
+    inputcif = Path(Args.ciffile)
+    IDDict, SSDict, CSDict = get_entity_seqs(inputcif)
     print(IDDict)
     print(SSDict)
     print(CSDict)
-    name = Args.ciffile.split('.')[0]
+    name = inputcif.stem
     PIDlist = alignseqs(SSDict, CSDict, IDDict)
 
     with open(f'{Path(Args.outpath)}/{name}_percentage_ids.dat', 'w') as f:
