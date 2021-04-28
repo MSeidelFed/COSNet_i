@@ -1,4 +1,4 @@
-#!/usr/env/bin/ python3
+#!/usr/bin/env  python3
 """
 [split_cif_by_entity.py]
 

@@ -1,25 +1,28 @@
-#!/usr/env/bin/python3
+#!/usr/bin/env python3
 """
-[sample_network.py]: 
-Usage: python3 intcryomics.py [filewithedgelist] [sigfile] [walklength] [iterationnum]
+[intcryomics.py]
+
+This script is a command-line interface to perform the main COSNet_i analysis.
+
+It creates a structural network, samples regions, and tests each region
+for significance according to given omics data.
+
+USAGE: python3 intcryomics.py filewithedgelist sigfile walklength iterationnum
 """
-## IMPORTS
-from sys import argv
+import os
+import collections
+import random
+import pickle
+import itertools
+import argparse
+import math
+
 from scipy import stats
-import operator
 import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
-import collections
-import os
-import random
-import glob
-import math
-import pickle
-import itertools
 from statsmodels.sandbox.stats.multicomp import multipletests
-import argparse
-## FUNCTIONS
+
 def get_network_from_edges(edgelistfile):
     """ """
     G = nx.read_edgelist(edgelistfile, data=(('weight',float),))

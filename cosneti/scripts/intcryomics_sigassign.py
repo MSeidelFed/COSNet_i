@@ -1,10 +1,10 @@
-#!/usr/env/bin/python3
+#!/usr/bin/env python3
 """
 [intcryomics_sigassign.py]
 Usage: python3 intcryomics.py filewithedgelist walklength iterationnum --sigfile [sigfile]
 """
 ## IMPORTS
-from sys import argv, exit
+from sys import exit
 from scipy import stats
 import operator
 import numpy as np

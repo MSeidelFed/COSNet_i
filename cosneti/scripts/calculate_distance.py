@@ -1,4 +1,4 @@
-#!/usr/env/bin/ python3
+#!/usr/bin/env python3
 """
 [calculate_distance.py]
 
@@ -29,7 +29,7 @@ def get_struct(PDBfilepath):
 
     Parameters
     ----------
-    PDBfilepath: 
+    PDBfilepath: pathlib.PosixPath
 
     Returns
     -------
