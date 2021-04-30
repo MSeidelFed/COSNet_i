@@ -108,7 +108,7 @@ $ mkdir redxd_6snt
 
 $ mkdir redxd_6gz5
 ```
-**2a. BATCH version: reindexing objects with a bash script**
+**2aa. BATCH version .sh: reindexing objects with a bash script**
 
 - Make a 2-column names file, if you create the names file with excel you might want to getrid of the carriage returns, e.g.:
 ```bash
@@ -126,6 +126,14 @@ _Usage:_ ```bash Batch_files/batch_reindex_PDBs.sh <pathtopythoncode> <pathto/in
 $ bash Batch_files/batch_reindex_PDBs.sh Python_Modules/ Data/names_6snt.txt trial_6snt/ redxd_6snt/ 1
 
 $ bash Batch_files/batch_reindex_PDBs.sh Python_Modules/ Data/names_6gz5.txt trial_6gz5/ redxd_6gz5/ 1
+```
+**2ab. BATCH version .py: reindexing objects with a python script**
+
+_Usage:_ ```python3 reindex_pdb.py [-h] <listofpdbtuples> <pdbpath> <outpath>```
+```bash
+$ python3 Python_Modules/batch_reindex_pdb.py Data/names_6gz5.txt trial_6gz5/ redxd_6gz5/
+
+$ python3 Python_Modules/batch_reindex_pdb.py Data/names_6snt.txt trial_6snt/ redxd_6snt/
 ```
 **2b. SINGLE version: reindexing one by one**
 
