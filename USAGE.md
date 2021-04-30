@@ -185,7 +185,7 @@ $ bash Batch_files/batch_calc_dist.sh Python_Modules/ combi_names_6gz5.txt redxd
 ```
 In this case your ```combi_names.txt``` file should be a two column file where you list ```file1 file2``` with a whitespace inbetween.
 
-**4ab. BATCH version .py: reindexing objects with a python script**
+**4ab. BATCH version .py**
 
 _Usage:_ ```python3 batch_calc_dist.py [-h] <combi_list> <pdbpath> <outpath>```
 ```bash
