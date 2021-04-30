@@ -52,7 +52,7 @@
 6gz5_mRNA.pdb 1 mRNA.pdb
 6gz5_PHOSPHOAMINOPHOSPHONIC_ACID-GUANYLATE_ESTER.pdb 1 PAGE.pdb
 6gz5_P_P-site-tRNA.pdb 1 P_site.pdb
-6gz5_RACK_1_ribosomal.pdb 1 RACK1.pdb
+6gz5_RACK_1_ribosomal.pdb 1 RACK1_RACK1.pdb
 6gz5_uL10_ribosomal.pdb 1 uL10_RPP0.pdb
 6gz5_uL11_ribosomal.pdb 1 uL11_RPL12.pdb
 6gz5_uL13_ribosomal.pdb 1 uL13_RPL13a.pdb
