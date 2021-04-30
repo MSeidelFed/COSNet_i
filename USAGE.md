@@ -176,7 +176,7 @@ $ mkdir DistMat_6snt
 
 $ mkdir DistMat_6gz5
 ```
-**4. Calculating distance matrices between objects with a bash script**
+**4aa. Calculating distance matrices between objects with a bash script**
 
 _Usage:_ ```bash Batch_files/batch_calc_dist.sh <pathtopythoncode> <pathto/infile> <pathtopdbs> <outpath>```
 ```bash
@@ -186,7 +186,16 @@ $ bash Batch_files/batch_calc_dist.sh Python_Modules/ combi_names_6gz5.txt redxd
 ```
 In this case your ```combi_names.txt``` file should be a two column file where you list ```file1 file2``` with a whitespace inbetween.
 
-**5. Calculating distance matrices one by one**
+**4ab. BATCH version .py: reindexing objects with a python script**
+
+_Usage:_ ```python3 reindex_pdb.py [-h] <listofpdbtuples> <pdbpath> <outpath>```
+```bash
+$ python3 Python_Modules/batch_calc_dist.py combi_names_6gz5.txt redxd_6gz5/ DistMat_6gz5
+
+$ python3 Python_Modules/batch_calc_dist.py combi_names_6snt.txt redxd_6snt/ DistMat_6snt
+```
+
+**4b. Calculating distance matrices one by one**
 
 _Usage:_ ```python3 calculate_distance.py [-h] <pathto/PDBfile1> <pathto/PDBfile2> <outpath>```
 ```bash
