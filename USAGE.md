@@ -187,7 +187,7 @@ In this case your ```combi_names.txt``` file should be a two column file where y
 
 **4ab. BATCH version .py: reindexing objects with a python script**
 
-_Usage:_ ```python3 reindex_pdb.py [-h] <listofpdbtuples> <pdbpath> <outpath>```
+_Usage:_ ```python3 batch_calc_dist.py [-h] <combi_list> <pdbpath> <outpath>```
 ```bash
 $ python3 Python_Modules/batch_calc_dist.py combi_names_6gz5.txt redxd_6gz5/ DistMat_6gz5
 
