@@ -127,7 +127,7 @@ $ bash Batch_files/batch_reindex_PDBs.sh Python_Modules/ Data/names_6snt.txt tri
 
 $ bash Batch_files/batch_reindex_PDBs.sh Python_Modules/ Data/names_6gz5.txt trial_6gz5/ redxd_6gz5/ 1
 ```
-**2ab. BATCH version .py: reindexing objects with a bash script**
+**2ab. BATCH version .py: reindexing objects with a python script**
 
 _Usage:_ ```python3 reindex_pdb.py [-h] <listofpdbtuples> <pdbpath> <outpath>```
 ```bash
