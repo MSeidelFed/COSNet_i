@@ -1,7 +1,7 @@
 # COSNet<sub>i</sub> - ComplexOme-Structural Network Interpreter
 **Integration of omics relative changes into sampled interaction networks translated from cryogenic or crystallographic based atomic structures of multiprotein complexes.**
 ## Introduction
-COSNet<sub>i</sub> is a collection of scripts to randomly select spatial neighborhoods of proteins from a multiprotein complex in order to test whether these neighbors characterize a region within the complex that becomes significantly enriched upon any experimental procedure. The procedure has been detailed in XXXXX and XXXXX publication.
+COSNet<sub>i</sub> is a collection of scripts to randomly select spatial neighborhoods of proteins from a multiprotein complex in order to test whether these neighbors characterize a region within the complex that becomes significantly enriched upon any experimental procedure. The procedure has been detailed in [10.3390/ijms22116160](https://doi.org/10.3390/ijms22116160) and XXXXX publication.
 
 The repo follows this file structure, in order of relevance:
 
