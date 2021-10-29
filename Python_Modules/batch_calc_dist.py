@@ -11,10 +11,16 @@ RETURNS
 """
 ### IMPORTS
 import glob
+import sys
 import os
 import argparse
 import subprocess
 from pathlib import Path
+
+### PATH TO SCRIPTS
+sys.path.append(".")
+sys.path.append("Python_Modules")
+sys.path.append("../Python_Modules")
 
 ### FUNCTIONS
 def iterate_run_calcdist(listoffiletuples, pdbpath, outpath):
