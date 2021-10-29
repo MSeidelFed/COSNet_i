@@ -15,7 +15,7 @@ Below is an illustration of the workflow. Current work is in progress to develop
 
 **Workflow**
 
-![Workflow](https://github.com/MSeidelFed/COSNet_i/tree/packaging/images/COSNet_i_workflow.png)
+![Workflow](tree/packaging/images/COSNet_i_workflow.png)
 
 mmCIF icon was taken from [IUCr](http://ww1.iucr.org/)
 
