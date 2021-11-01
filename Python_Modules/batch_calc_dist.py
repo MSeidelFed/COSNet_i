@@ -2,12 +2,11 @@
 """
 [batch_calc_dist.py]
 
-DESCRIPTION
+This script is a command-line interface to calculate distances
+between structures in batch. It runs calculate_distance.py over
+a given list of pdb files pairs.
 
-USAGE
-
-RETURNS
-
+USAGE: python3 batch_calc_dist.py infile inputpath outputpath
 """
 ### IMPORTS
 import glob
@@ -24,6 +23,15 @@ sys.path.append("../Python_Modules")
 
 ### FUNCTIONS
 def iterate_run_calcdist(listoffiletuples, pdbpath, outpath):
+    """
+    Iteratively runs calculate_distance.py over pairs of files.
+
+    Parameters
+    ----------
+    listofffiletuples: list
+    pdbpath: pathlib.PosixPath
+    outpath: pathlib.PosixPath
+    """
     counter=1
     for filetuple in listoffiletuples:
         pdbfile1 = pdbpath.joinpath(filetuple[0])
@@ -33,7 +41,6 @@ def iterate_run_calcdist(listoffiletuples, pdbpath, outpath):
         print(f"{pdbfile2}")
         subprocess.run(["python3", "calculate_distance.py", f"{pdbfile1}", f"{pdbfile2}", f"{outpath}"])
         counter+=1
-    return
 
 def parse_arguments():
     parser = argparse.ArgumentParser(usage="python3 %(prog)s [-h] infile inputpath outputpath",

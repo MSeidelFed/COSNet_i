@@ -2,12 +2,10 @@
 """
 [batch_reindex_pdb.py]
 
-DESCRIPTION
+This script is a command-line interface to reindex pdb files in batch.
+It runs reindex_pdb.py over a given list of pdbfiles.
 
-USAGE
-
-RETURNS
-
+USAGE: python3 batch_reindex_pdb.py infile inputpath outputpath
 """
 ### IMPORTS
 import argparse
@@ -21,6 +19,15 @@ sys.path.append("../Python_Modules")
 
 ### FUNCTIONS
 def iterate_run_reindex(listofpdbtuples, pdbpath, outpath):
+    """
+    Iteratively runs reindex_pdb.py over pdb files.
+
+    Parameters
+    ----------
+    listofpdbtuples: list
+    pdbpath: pathlib.PosixPath
+    outpath: pathlib.PosixPath
+    """
     counter=1
     for filetuple in listofpdbtuples:
         pdbfile = pdbpath.joinpath(filetuple[0])

@@ -1,31 +1,46 @@
-#!/usr/env/bin/ python3
+#!/usr/bin/env python3
 """
 [calculate_distance.py]
 
-DESCRIPTION: Calculates distances between objects in two entities 
-(e.g. residues in PDB files) and stores in a distance matrix
-
-USAGE: python3 calculate-distance.py <pdbfile1> <pdbfile2>
-
-RETURNS: dist_mtx_<pdbfile1>_<pdbfile1>.csv
+This script is a command-line interface to
+calculate distances between objects in two entities 
+(e.g. residues in PDB files) and stores them in a distance matrix.
 
 Currently uses the geometric center of mass for coarse-graining 
 the entity (a protein amino acid represented by the center of mass
 of its atoms, for example, and same goes for a nucleotide)
+
+USAGE: python3 calculate-distance.py pdbfile1 pdbfile2
+
+RETURNS: dist_mtx_pdbfile1_pdbfile1.csv
 """
-###### IMPORTS ######
-from sys import argv
-from Bio.PDB import PDBParser
 from pathlib import Path
-import numpy as np
 import os
 import argparse
-## FUNCTIONS
+
+from Bio.PDB import PDBParser
+import numpy as np
+
 def get_struct(PDBfilepath):
     """
     Takes in PDB file, parses out structural information
     Returns structure object, original PDB ID of structure, entity name (if 
     file is a portion of the original larger file, say an r protein or rRNA) 
+
+    Parameters
+    ----------
+    PDBfilepath: pathlib.PosixPath
+
+    Returns
+    -------
+    structure: Bio.PDB.Structure.Structure
+        biopython-parsed PDB structure object
+    struct_id: str
+        4-letter PDB identifier
+    ent_id: str
+        entity name from CIF file, name of pdb file
+    residues: generator
+        residues from pdb file
     """
     parser = PDBParser(PERMISSIVE=1)
     PDBfile = os.path.basename(PDBfilepath)
@@ -45,7 +60,16 @@ def get_struct(PDBfilepath):
 def center_of_mass(one_residue, flag=0):
     """
     Finds the center of mass of a residue
-    Returns this as (x,y,z)
+    Returns this as a tuple (x,y,z)
+
+    Parameters
+    ----------
+    one_residue: Bio.PDB.Residue.Residue
+
+    Returns
+    -------
+    com: tuple
+        3-item tuple of center of mass of residue
     """
     x, y, z = 0, 0, 0
     com = 0
@@ -58,13 +82,23 @@ def center_of_mass(one_residue, flag=0):
         com = (x/res_size, y/res_size, z/res_size)
         return com
     else:
-    # here do the gravitational-based centre of mass  
+    # TODO: here do the gravitational-based centre of mass  
         return com
       
 def calc_resi_dist(coords1, coords2):
     """
-    Takes two coordinates, calculates euclidean distance
-    between the two
+    Calculates euclidean distance between two 
+    sets of coordinates
+
+    Parameters
+    ----------
+    coords1: tuple
+    coords2: tuple
+        3-item tuples of center of masses
+
+    Returns
+    -------
+    dist: numpy.float64
     """
     a = np.array(coords1)
     b = np.array(coords2)
@@ -75,6 +109,17 @@ def calc_dist_matrix(entity1, entity2):
     """
     Takes in two lists of coordinates, creates distance
     matrix to store all pairwise combinations of the coordinates
+
+    Parameters
+    ----------
+    entity1: tuple
+    entity2: tuple
+        3-item tuples of center of masses
+
+    Returns
+    -------
+    dist_mtx: numpy.ndarray
+        array of distances
     """
     dist_mtx = np.zeros((len(entity1),len(entity2)))
     for i, coords_one in enumerate(entity1):
@@ -83,11 +128,11 @@ def calc_dist_matrix(entity1, entity2):
     return dist_mtx
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(usage="python3 %(prog)s [-h] <pathto/PDBfile1> <pathto/PDBfile2> <outpath>",
+    parser = argparse.ArgumentParser(usage="python3 %(prog)s [-h] pdbfile1 pdbfile2 outpath",
                                      description="Calculates Euclidean distances between residues of two PDB files, stores in distance matrix file.")
     parser.add_argument("pdbfile1",help="First PDB file",type=str)
     parser.add_argument("pdbfile2",help="Second PDB file",type=str)
-    parser.add_argument("outpath",help="Where to output distance matrix file",type=str)
+    parser.add_argument("outpath",help="Path to dir to output distance matrix file",type=str)
     args = parser.parse_args()
     return args
 
@@ -95,10 +140,7 @@ def parse_arguments():
 if __name__ == "__main__":
     #usage
     Args = parse_arguments()
-    if Args.outpath=='.':
-        outpath=Path.cwd()
-    else:
-        outpath=Path(Args.outpath)
+    outpath=Path(Args.outpath)
     #parse out structures and info of both files
     Ent1Struct, Struct1ID, Ent1ID, Residues1 = get_struct(Args.pdbfile1)
     Ent2Struct, Struct2ID, Ent2ID, Residues2 = get_struct(Args.pdbfile2)
