@@ -1,29 +1,47 @@
-#!/usr/env/bin/python3
+#!/usr/bin/env python3
 """
 [intcryomics_sigassign.py]
-Usage: python3 intcryomics.py filewithedgelist walklength iterationnum --sigfile [sigfile]
+
+This script is a command-line interface to perform the main COSNet_i analysis.
+
+It creates a structural network, samples regions, and tests each region
+for significance according to given omics data.
+
+You have the option to assign your own significance values, or upload a significance file.
+
+USAGE: python3 intcryomics.py filewithedgelist walklength iterationnum --sigfile [sigfile]
 """
-## IMPORTS
-from sys import argv, exit
-from scipy import stats
-import operator
-import numpy as np
-import networkx as nx
-import matplotlib.pyplot as plt
+from sys import exit
 import collections
 import os
 import time
 import random
-import glob
 import math
 import pickle
 import itertools
-from statsmodels.sandbox.stats.multicomp import multipletests
 import argparse
 from pathlib import Path
-## FUNCTIONS
+
+from scipy import stats
+import numpy as np
+import networkx as nx
+import matplotlib.pyplot as plt
+from statsmodels.sandbox.stats.multicomp import multipletests
+
 def get_network_from_edges(edgelistfile):
-    """ """
+    """ 
+    Creates network from list of connected nodes.
+    Gets adjacency matrix.
+
+    Parameter
+    ---------
+    edgelistfile: pathlib.PosixPath
+
+    Returns
+    -------
+    G: networkx.classes.graph.Graph
+    adjmtx: numpy.ndarray
+    """
     G = nx.read_edgelist(edgelistfile, data=(('weight',float),))
     print(f'List of nodes: {G.nodes()}\n')
     #for node in G.nodes():
@@ -35,7 +53,6 @@ def get_network_from_edges(edgelistfile):
     #degmtx = np.diag(np.sum(adjmtx, axis=0))
     #np.savetxt('degmatrix.dat', degmtx, delimiter=',')
     np.savetxt('adjmatrix.dat', adjmtx, delimiter=',') 
-
     return G, adjmtx
 
 def transit_design(adjacent_mtx):
@@ -43,36 +60,39 @@ def transit_design(adjacent_mtx):
     Returns matrix of transit probabilities for the random walk
     where probabilities are calculated based on the network weighting scheme:
         P = w_{x,y}/w_{x} where w_{x} is the sum of all weights for outgoing edges from node x
+
+    Parameter
+    ---------
+    adjacent_mtx: numpy.ndarray
+
+    Returns
+    -------
+    transmtx: numpy.ndarray
     """
     summtx = np.diag(np.sum(adjacent_mtx, axis=0))
     transmtx = np.dot(np.linalg.inv(summtx),adjacent_mtx)
     np.savetxt('Tmatrix.dat', transmtx, delimiter = ',')    
     return transmtx
 
-def random_walk(transit_mtx, startnodelist, nodelist, walklength):
-    """ 
-    Implements random walk based on random starts (if given a multi-element list)
-    or a particular startnode (list with one element), for a certain walklength,
-    based on probabilities as given in the transit matrix
-    """
-    startnode = random.choice(startnodelist)
-    startnode_idx = nodelist.index(startnode)
-    v_i = np.zeros(len(nodelist))
-    v_i[startnode_idx] = 1
-    visited = [startnode_idx]
-    visitednames = [startnode]
-    for i in range(walklength):
-        v_i = np.dot(v_i, transit_mtx)
-        m = max(v_i)
-        nextnode_idx = random.choice([i for i, j in enumerate(v_i) if j == m])
-        visited.append(nextnode_idx)
-        visitednames.append(nodelist[nextnode_idx])
-        v_i = np.zeros(len(nodelist))
-        v_i[nextnode_idx] = 1
-    return visited, visitednames
-
 def generateSequence(startIndex, transitionMatrix, path_length, alpha = 0.1):
-    """ """
+    """ 
+    Generates random sequence of steps according to the transition matrix.
+
+    Parameters
+    ----------
+    startIndex: int
+        index of starting node
+    transitionMatrix: numpy.ndarray
+        matrix of transition probabilities
+    path_length: int
+    alpha: float
+        allows for circular steps
+
+    Returns
+    -------
+    result: list
+        list of steps in random sequence
+    """
     result = [startIndex]
     current = startIndex
 
@@ -89,7 +109,22 @@ def generateSequence(startIndex, transitionMatrix, path_length, alpha = 0.1):
     return result
 
 def random_walk_new(G, transitmtx, iter_num, walk_length):
-    """ """
+    """
+    Performs random walk for given length with number
+    of repeats given by iter_num.
+
+    Parameters
+    ----------
+    G: networkx.classes.graph.Graph
+    transitmtx: numpy.ndarray
+    iter_num: int
+    walk_length: int
+
+    Returns
+    -------
+    WalksDict: dict
+        dict of walks of format {(startnode, walk#): [step1, step2, ...], ...}
+    """
     nodes = list(G.nodes())
     WalksDict = {}
     count = 0
@@ -107,8 +142,15 @@ def get_significance_values(filewithsigs):
     """ 
     Reads in a two-column file with proteins and binary encoding
     for significant or non-significant abundance changes
+
+    Parameters
+    ----------
+    filewithsigs: pathlib.PosixPath
     
-    Returns a dictionary of form: { prot : 0/1 }
+    Returns
+    -------
+    sig_dict: dict
+        dict of form: { prot : 0/1 }
     """
     sig_dict = {}
     with open(filewithsigs, 'r') as f:
@@ -118,7 +160,18 @@ def get_significance_values(filewithsigs):
     return sig_dict
 
 def manual_get_sig_vals(regiondict, listofprots):
+    """
+    Allows for manual assignment of significance values.
 
+    Parameters
+    ----------
+    regiondict: dict
+    listofprots: list
+
+    Returns
+    -------
+    altsigdict: dict
+    """
     altsigdict={}
     for prot in listofprots: #set all prots to 0
         altsigdict[prot]=[0] 
@@ -174,7 +227,18 @@ Type in the region number(s) in which you would like to assign significances (se
 
 def get_sig_vals_full(filewithsigs):
     """
+    Gets dict of omics significance values per node in network.
     Gives back form of {uL1:[0,0,0],uL2:[1,1,1]...}
+
+    Parameters
+    ----------
+    filewithsigs: pathlib.PosixPath
+        whitespace separated, two col file with nodes and significances
+
+    Returns
+    -------
+    sig_dict_full: dict
+        dict of nodes and a list of their significances
     """
     sig_dict_full = {}
     with open(filewithsigs,'r') as f:
@@ -186,22 +250,6 @@ def get_sig_vals_full(filewithsigs):
                 sig_dict_full[line_elems[0]].append(int(line_elems[1]))
     return sig_dict_full
                 
-
-def iterate_random_walk(nodelist, iteratenumber, transitmtx, walklength):
-    """
-    Iteratively runs the random walk based on a given iteration number
-    """
-    WalksDict = {}
-    count = 0
-    for j in range(len(nodelist)):
-        startnode = [nodelist[j]]
-        for i in range(iteratenumber):
-            visit_list, visitednames = random_walk(transitmtx, startnode, nodelist, walklength)
-            entryname = (startnode[0], count)
-            WalksDict[entryname] = visit_list
-            print(f'{entryname} {visit_list}')
-            count += 1
-    return WalksDict
 
 def binom_test_regions(dictofregions, Nodelist, SigDict, siglvl=0.05):
     """ 
@@ -226,8 +274,18 @@ def binom_test_regions(dictofregions, Nodelist, SigDict, siglvl=0.05):
 
 def fishers_exact_test_regions(dictofregions, Nodelist, SigDict):
     """
-    have to count how many actually in one region (including rps)
-    and also how many sig
+    Performs fishers exact test for significance per sampled region.
+
+    Parameters
+    ----------
+    dictofregions: dict
+    Nodelist: list
+    SigDict: dict
+
+    Returns
+    -------
+    TestResDict: dict
+    PvalList: list
     """
     TestResDict = {}
     PvalList = []
@@ -264,6 +322,16 @@ def get_minimum_set_cover(nodelist, listofsubsets):
     """
     Implements the minimum set cover algorithm to find non-overlapping sets
     out of the 80 ribosomal sampled regions
+
+    Parameters
+    ----------
+    nodelist: list
+    listofsubsets: list
+
+    Returns
+    -------
+    cover: list
+        list of sets of sampled regions
     """
     indices = set(range(len(nodelist)))
     elems = set(e for s in listofsubsets for e in s)
@@ -348,8 +416,19 @@ def summarise_random_walk_results(dictofwalks, nodelist, iterationnum):
     """ 
     Takes in dictionary of walks, nodelist, and iteration number to 
     calculate per protein, of all the visited nodes over all walks,
-    how many times each node was visited
-    Returns a dictionary with counts
+    how many times each node was visited.
+    Returns a dictionary with counts.
+
+    Parameters
+    ----------
+    dictofwalks: dict
+    nodelist: list
+    iterationnum: int
+
+    Returns
+    -------
+    sampledsubsets: dict
+        dict of nodes visited and visitation counts per node
     """
     sampledsubsets = {}
     count = 0
@@ -381,7 +460,19 @@ def get_subsets(sampledsubsetdict, nodelist, iteration_num):
     """
     Takes a dictionary of counts and returns subsets per protein 
     in a list, with the constraint that subsets contain proteins 
-    visited at least t times 
+    visited at least t times.
+
+    Parameters
+    ----------
+    sampledsubsetdict: dict
+        dict of nodes visited and visitation counts per node
+    nodelist: list
+    iteration_num: int
+
+    Returns
+    -------
+    masterlist: list
+        subsets per protein
     """
     t=math.ceil(iteration_num/2)
     masterlist = []
@@ -404,6 +495,14 @@ def get_subsets(sampledsubsetdict, nodelist, iteration_num):
 def calculate_overlap(dictofsubsets):
     """Takes in a dictionary of subsets, calculates overlaps between all pairwise
     combinations of the subsets, and returns dictionary with set pair IDs and overlaps
+
+    Parameters
+    ----------
+    dictofsubsets: dict
+
+    Returns
+    -------
+    dictofoverlap: dict
     """
     dictofoverlap = {}
     for i in range(len(dictofsubsets)):
@@ -464,7 +563,6 @@ if __name__ == "__main__":
 
     # iteratively induce random walk, save to a dictionary
     WalksDict = random_walk_new(Net, Tmtx, iteration_num, walk_length)
-    # WalksDict = iterate_random_walk(Nodelist, iteration_num, Tmtx, walk_length)
 
     # counts visits per node, saves to a dict, keep only proteins that meet threshold cutoff
     SampledSetsDict = summarise_random_walk_results(WalksDict, Nodelist, iteration_num)
