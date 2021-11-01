@@ -1,22 +1,35 @@
-#!/usr/env/bin/ python3
+#!/usr/bin/env  python3
 """
 [split_cif_by_entity.py]
 
-USAGE: python3 split_cif_by_entity.py <inputfile> <pathtooutput>
+USAGE: python3 split_cif_by_entity.py inputfile pathtooutput
+
+This script is a command-line interface to extract and
+save structural data for all entities from a mmCIF file. 
 """
-###### IMPORTS ######
-from sys import argv
-from Bio.PDB.MMCIFParser import MMCIFParser
-from Bio.PDB.MMCIF2Dict import MMCIF2Dict
+
 from collections import Counter
+from pathlib import Path
 import argparse
-import os
-import glob
-## FUNCTIONS
+
+from Bio.PDB.MMCIF2Dict import MMCIF2Dict
+
 def lower_upper_idx(EntityAtomIDs):
     """
-    Returns dictionary of lower and upper indices for 
-    entities in the atomic data block of mmCIF file,
+    Gets lower and upper indices (row #s) for each 
+    entity in the atomic data block of mmCIF file
+
+    Parameters
+    ----------
+    EntityAtomIDs: list
+        list of entity ids per atom, indicates
+        which entity atom belongs to
+
+    Returns
+    -------
+    idx_dict: dict
+        dict with entity atom row ranges
+        {entid: (start, stop)}
     """
     ent_instances = dict(Counter(EntityAtomIDs))
     idx_dict = {}
@@ -30,15 +43,25 @@ def lower_upper_idx(EntityAtomIDs):
             end = end+length
     return idx_dict
 
-def grab_struct_data(ObjName, IDxDict, NamesList, CIFDict, address):
+def writeout_struct_data(ObjName, IDxDict, NamesList, CIFDict, address):
     """
     Takes values from cifdict corresponding to the desired
-    structural features, prints them according to PDB standard
-    format in a file (column ranges serve as identifiers)
-    """
-    if address[:-1] != "/":
-        address = address + "/"
+    structural features
+    Saves them to file according to PDB standard format 
 
+    Parameters
+    ----------
+    ObjName: str
+        4-letter cif file identifier
+    IDxDict: dict
+        dict with entity atom row ranges {entid: (start, stop)}
+    NamesList: list
+        list of entity names
+    CIFDict: Bio.PDB.MMCIF2Dict.MMCIF2Dict
+        parsed dict of cif info
+    address: str
+
+    """
     print(f'Output PDBs found in: {address}\n')
 
     atomlist = CIFDict["_atom_site.group_PDB"]
@@ -63,7 +86,8 @@ def grab_struct_data(ObjName, IDxDict, NamesList, CIFDict, address):
             protid = entity_name.split('_protein_')
             entity_name = f'{protid[1]}_{protid[0]}'
         try:
-            structfile = open(f'{address}{ObjName}_{entity_name}.pdb', 'w+')
+            pdbfilename = f'{ObjName}_{entity_name}.pdb' 
+            structfile = open(f'{address.joinpath(pdbfilename)}', 'w+')
         except:
             print('Error in opening file: Check that naming and path scheme is correct!')
             print('Moving onto next entity.\n')
@@ -83,9 +107,18 @@ def grab_struct_data(ObjName, IDxDict, NamesList, CIFDict, address):
 
 def check_entityname(entnamelist):
     """
-    Checks for and replaces non alpha-numeric characters with underscore,
-    allows: -, (, ), empty space.
-    Returns list of edited entity names.
+    Checks for non alpha-numeric characters 
+    in entity names. Replaces any with underscore.
+    Directly modifies input list. 
+    Allows: -, (, ), empty space.
+
+    Parameters
+    ----------
+    entnamelist: list
+
+    Returns 
+    -------
+    entnamelist: list
     """
     allowedchars = ['-', '(', ')', ' ']
     for i in range(0,len(entnamelist)):
@@ -96,38 +129,39 @@ def check_entityname(entnamelist):
             edited_name = ''.join(edited_name)
             entnamelist[i] = edited_name
     return entnamelist
-          
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(usage="python3 %(prog)s [-h] <pathto/CIFfile> <outpath>",
+    parser = argparse.ArgumentParser(usage="python3 %(prog)s [-h] CIFfile outpath",
                                      description="Splits CIF into separate PDB files per entity")
     parser.add_argument("CIFfile", help="CIF file input to be split", type=str)
     parser.add_argument("outpath",help="Output path", type=str)
     args = parser.parse_args()
     return args
-    
+
 def main():
     # get arguments
     Args = parse_arguments()
 
     # read in data file from command line
-    pathtociffile = Args.CIFfile
-    obj_name = os.path.basename(pathtociffile)[:-4]    
-    address = Args.outpath
+    pathtociffile = Path(Args.CIFfile) 
+    obj_name = pathtociffile.stem
+    address = Path(Args.outpath)
 
-    # save contents as a dictionary
-    cif_dict = MMCIF2Dict(pathtociffile)
+    if not pathtociffile.exists() or not address.exists():
+        raise Exception('Incorrect path specifications in input. Verify!')
+    else:
+        # save contents as a dictionary
+        cif_dict = MMCIF2Dict(pathtociffile) 
 
-    # get lists of identifiers and entities
-    ent_id = cif_dict["_entity_poly.entity_id"]
-    ent_name = cif_dict["_entity.pdbx_description"]
-    new_ent_name = check_entityname(ent_name)
-    ent_atom_ids = cif_dict["_atom_site.label_entity_id"]
+        # get lists of identifiers and entities
+        ent_id = cif_dict["_entity_poly.entity_id"] 
+        ent_name = cif_dict["_entity.pdbx_description"] 
+        new_ent_name = check_entityname(ent_name) 
+        ent_atom_ids = cif_dict["_atom_site.label_entity_id"] 
 
-    # get dictionary of indices per entity indicating corresponding rows of the atomic data 
-    IDxDict = lower_upper_idx(ent_atom_ids)
-    grab_struct_data(obj_name, IDxDict, new_ent_name, cif_dict, address)
+        # get dictionary of indices per entity indicating corresponding rows of the atomic data 
+        IDxDict = lower_upper_idx(ent_atom_ids)
+        writeout_struct_data(obj_name, IDxDict, new_ent_name, cif_dict, address)
     
-## MAIN
 if __name__ == "__main__":
     main()
