@@ -1,4 +1,4 @@
-#!/env/usr/bin python3
+#!/usr/bin/env python3
 """
 [reindex_pdb_residues.py]
 
