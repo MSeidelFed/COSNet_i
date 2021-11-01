@@ -1,24 +1,23 @@
-#!/usr/env/bin/ python3
+#!/usr/bin/env python3
 """
 [extract_sequence.py]
 
 DESCRIPTION: Extracts sequence corresponding to the documented sequence
 in a mmCIF file, also extracts sequence based on structural data in pdb file,
-this is to compare sequences for missing residues 
+this is to compare sequences for missing residues. 
 
-USAGE: python3 extract_sequence.py <PDBfile> <CIFfile> <EntityNumber> <TypeTag> 
+USAGE: python3 extract_sequence.py PDBfile CIFfile EntityNumber TypeTag 
 
 RETURNS: Fasta file with the two sequences, print in stdout whether sequences
 match or not
-
 """
-###### IMPORTS ######
-from sys import argv
+import os 
+import argparse
+from pathlib import Path
+
 from Bio.PDB import PDBParser
 from Bio.PDB.MMCIF2Dict import MMCIF2Dict
 import numpy as np
-import os 
-import argparse
 
 global THREE_TO_ONE
 THREE_TO_ONE = {'ALA': 'A', 'ARG': 'R', 'ASN': 'N',
@@ -31,18 +30,16 @@ THREE_TO_ONE = {'ALA': 'A', 'ARG': 'R', 'ASN': 'N',
 ## FUNCTIONS
 def three_letter_to_one_letter(chain, code=THREE_TO_ONE):
     """
-    Translate' a chain of amino acids in three letter code to one letter code.
-    Note that the returned object contains no structural information: it is
-    only the sequence of the protein.
+    Translate a chain of amino acids in three letter code to one letter code.
 
     Arguments
     ---------
     chain: Bio.PDB.Chain.Chain object or list of Bio.PDB.Residue.Residue
-    code:  dict, conversion table
+    code:  dict
 
     Returns
     -------
-    translated_chain: string
+    translated_chain: str
     """
     translated_chain = []
     for res in list(chain):
@@ -61,7 +58,18 @@ def get_struct(pathtoPDBfile, PDBname, CIFname):
     Note: deals with files of the form: 4v7e_18S_ribosomal_RNA.pdb, 
     or of the form eL13_rpL13.pdb or 4v7e_RACK1.pdb
 
-    clean this up later!!!
+    Parameters
+    ----------
+    pathtoPDBfile: str
+    PDBname: str
+    CIFname: str
+
+    Returns
+    -------
+    structure: Bio.PDB.Structure.Structure
+    struct_id: str
+    ent_id: str
+    residues: generator
     """
     parser = PDBParser(PERMISSIVE=1)
     struct_id_elems = PDBname.split("_")
@@ -85,6 +93,15 @@ def get_struct(pathtoPDBfile, PDBname, CIFname):
 def get_prot_res_seq_pdb(Residues_obj, tag):
     """
     Gives sequence as taken from the atomic coordinates section
+
+    Parameters
+    ----------
+    Residues_obj: generator
+    tag: str
+
+    Returns
+    -------
+    seq: str
     """
     ResiList = []
     if (tag == 'protein' or tag == 'prot'):
@@ -103,7 +120,16 @@ def get_prot_res_seq_pdb(Residues_obj, tag):
 def get_prot_res_seq_cif(CifDict, EntNum):
     """
     Gives sequence as taken from mmCIF file, entity poly pdbx seq section
-    Takes the canonical sequence (check this is right!)
+    Takes the canonical sequence. 
+
+    Parameters
+    ----------
+    CifDict: dict
+    EntNum: int
+
+    Returns
+    -------
+    canonseq: str
     """
 #    canon_seqlist = CifDict["_entity_poly.pdbx_seq_one_letter_code_can"][EntNum-1].split('\n')
     canon_seqlist = CifDict["_entity_poly.pdbx_seq_one_letter_code"][EntNum-1].split('\n')
@@ -118,7 +144,7 @@ def write_out_fasta(fasta_dict, outfile, outpath,flag='w'):
     os.rename(outfile, os.path.join(outpath, outfile))
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(usage="python3 %(prog)s [-h] <pathto/pdbfile> <pathto/CIFfile> <entitynum> <type> <outpath>",
+    parser = argparse.ArgumentParser(usage="python3 %(prog)s [-h] pdbfile CIFfile entitynum type outpath",
                                      description="Extracts sequence from CIF file, and also from the corresponding PDB file")
     parser.add_argument("pdbfile", help="PDB file", type=str)
     parser.add_argument("ciffile", help="CIF file", type=str)
@@ -132,10 +158,10 @@ def parse_arguments():
 if __name__ == "__main__":
     # parse args
     Args = parse_arguments()
-    pathto_pdbfile = Args.pdbfile
-    pdbname = os.path.basename(pathto_pdbfile)[:-4]
-    pathto_ciffile = Args.ciffile
-    cifname = os.path.basename(pathto_ciffile)[:-4]
+    pathto_pdbfile = Path(Args.pdbfile)
+    pdbname = pathto_pdbfile.stem
+    pathto_ciffile = Path(Args.ciffile)
+    cifname = pathto_ciffile.stem
     entitynum = int(Args.entitynum)
     typetag = str(Args.type) # protein, RNA, DNA
     print(f'----------------------- Type: {typetag}')
@@ -144,7 +170,6 @@ if __name__ == "__main__":
     #parse out structure and identifiers
     Structure, StructID, EntID, Residues = get_struct(pathto_pdbfile, pdbname, cifname)
     print(f'mmCIF: {StructID} PDB: {EntID}')
-
     #get sequence from mmCIF file
     cifdict = MMCIF2Dict(pathto_ciffile)
     CIFSeq = get_prot_res_seq_cif(cifdict, entitynum)
