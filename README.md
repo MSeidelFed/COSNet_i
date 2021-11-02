@@ -22,16 +22,23 @@ mmCIF icon was taken from [IUCr](http://ww1.iucr.org/)
 
 ## Installation
 
-Clone the repo:
-```
-git clone https://github.com/MSeidelFed/COSNet_i.git
-```
-Create a virtual environment. This step is optional
+Create a virtual environment. This step is optional, but we recommend this.
 ```
 pip install --user virtualenv
 virtualenv venv
 source venv/bin/activate
 ```
+
+The cosneti package is still undergoing finalised packaging but is available at TesPyPI:
+```
+pip install -i https://test.pypi.org/simple/ cosneti==0.0.1
+```
+
+To follow along the command-line usage, clone the repo:
+```
+git clone https://github.com/MSeidelFed/COSNet_i.git
+```
+
 Install python dependencies
 ```
 pip install -r requirements.txt
