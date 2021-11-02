@@ -1,0 +1,18 @@
+Metadata-Version: 2.1
+Name: cosneti
+Version: 0.0.1
+Summary: Integration of omics relative changes into sampled interaction networks translated from cryogenic or crystallographic based atomic structures of multiprotein complexes.
+Home-page: https://github.com/MSeidelFed/COSNet_i
+Author: Federico Martinez-Seidel
+Author-email: mseidel@mpimp-golm.mpg.de
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+UNKNOWN
+
