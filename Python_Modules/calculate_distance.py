@@ -127,23 +127,19 @@ def calc_dist_matrix(entity1, entity2):
             dist_mtx[i,j] = calc_resi_dist(coords_one, coords_two)
     return dist_mtx
 
-def parse_arguments():
-    parser = argparse.ArgumentParser(usage="python3 %(prog)s [-h] pdbfile1 pdbfile2 outpath",
-                                     description="Calculates Euclidean distances between residues of two PDB files, stores in distance matrix file.")
-    parser.add_argument("pdbfile1",help="First PDB file",type=str)
-    parser.add_argument("pdbfile2",help="Second PDB file",type=str)
-    parser.add_argument("outpath",help="Path to dir to output distance matrix file",type=str)
-    args = parser.parse_args()
-    return args
 
-## MAIN
-if __name__ == "__main__":
-    #usage
-    Args = parse_arguments()
-    outpath=Path(Args.outpath)
-    #parse out structures and info of both files
-    Ent1Struct, Struct1ID, Ent1ID, Residues1 = get_struct(Args.pdbfile1)
-    Ent2Struct, Struct2ID, Ent2ID, Residues2 = get_struct(Args.pdbfile2)
+def calculate_distance(outpath, pdbfile1, pdbfile2):
+    """Generates distance matrix based on center of mass coarse graining
+    between two pdbfiles
+
+    Parameters
+    ----------
+    pdbfile1: pathlib.PosixPath
+    pdbfile2: pathlib.PosixPath
+    outpath: pathlib.PosixPath
+    """
+    Ent1Struct, Struct1ID, Ent1ID, Residues1 = get_struct(pdbfile1)
+    Ent2Struct, Struct2ID, Ent2ID, Residues2 = get_struct(pdbfile2)
 
     #calculate center of masses for all residues
     ComsList1 = []
@@ -167,3 +163,21 @@ if __name__ == "__main__":
         np.savetxt('dist_mtx_{}_{}.csv'.format(Ent1ID,Ent2ID), DistMtx, delimiter=",")
         outfile = f'dist_mtx_{Ent1ID}_{Ent2ID}.csv'
         os.rename(outfile, os.path.join(outpath, outfile))
+
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(usage="python3 %(prog)s [-h] pdbfile1 pdbfile2 outpath",
+                                     description="Calculates Euclidean distances between residues of two PDB files, stores in distance matrix file.")
+    parser.add_argument("pdbfile1",help="First PDB file",type=str)
+    parser.add_argument("pdbfile2",help="Second PDB file",type=str)
+    parser.add_argument("outpath",help="Path to dir to output distance matrix file",type=str)
+    args = parser.parse_args()
+    return args
+
+## MAIN
+if __name__ == "__main__":
+    #usage
+    Args = parse_arguments()
+    outpath=Path(Args.outpath)
+
+    calculate_distance(outpath, Path(Args.pdbfile1), Path(Args.pdbfile2))

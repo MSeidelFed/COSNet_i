@@ -9,17 +9,15 @@ a given list of pdb files pairs.
 USAGE: python3 batch_calc_dist.py infile inputpath outputpath
 """
 ### IMPORTS
-import glob
 import sys
-import os
 import argparse
-import subprocess
 from pathlib import Path
 
 ### PATH TO SCRIPTS
-sys.path.append(".")
 sys.path.append("Python_Modules")
 sys.path.append("../Python_Modules")
+
+from calculate_distance import *
 
 ### FUNCTIONS
 def iterate_run_calcdist(listoffiletuples, pdbpath, outpath):
@@ -34,12 +32,12 @@ def iterate_run_calcdist(listoffiletuples, pdbpath, outpath):
     """
     counter=1
     for filetuple in listoffiletuples:
-        pdbfile1 = pdbpath.joinpath(filetuple[0])
-        pdbfile2 = pdbpath.joinpath(filetuple[1])
+        pdbfile1 = pdbpath.joinpath(Path(filetuple[0]))
+        pdbfile2 = pdbpath.joinpath(Path(filetuple[1]))
         print(f"Running on protein # {counter}")
         print(f"{pdbfile1}")
         print(f"{pdbfile2}")
-        subprocess.run(["python3", "calculate_distance.py", f"{pdbfile1}", f"{pdbfile2}", f"{outpath}"])
+        calculate_distance(outpath, pdbfile1, pdbfile2)
         counter+=1
 
 def parse_arguments():
