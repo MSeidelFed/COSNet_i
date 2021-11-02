@@ -31,7 +31,7 @@ def parse_pdb(PDBfile):
     struct = p.get_structure(name, PDBfile)
     return struct, name
 
-def reindex(structobj, startidx):
+def reindexstruct(structobj, startidx):
     """
     Reindexes residues per chain per model,
     directly modifies structobj
@@ -54,6 +54,28 @@ def reindex(structobj, startidx):
                     count += 1
     return structobj
 
+def reindex_pdb(startidx, pdbfile, outfile):
+    """Wrapper script to perform reindex task,
+    writes out reindexed structure.
+
+    Parameters
+    ----------
+    startidx: int
+    pdbfile: pathlib.PosixPath 
+    outfile: pathlib.PosixPath
+    """
+    if pdbfile.is_file() and outfile.parent.is_dir():
+        Struct, Name = parse_pdb(pdbfile)
+        Reindexed = reindexstruct(Struct, startidx)
+        # Save reindexed structure
+        io = PDBIO()
+        io.set_structure(Reindexed)
+        io.save(str(outfile))
+        print(f'Reindexed file: {Name}_reindex.pdb')
+        print(f'Saved at this location: {outfile.parent}')
+    else:
+        raise FileNotFoundError("Problem with input file or output path, check that both exist!")
+
 def parse_arguments():
     parser = argparse.ArgumentParser(usage="python3 %(prog)s [-h] startidx pdbfile outfile",
                                      description="Returns PDB file with residues reindexed according to start index")
@@ -63,24 +85,10 @@ def parse_arguments():
     args = parser.parse_args()
     return args
     
-def main():
+if __name__=="__main__":
     # Get arguments
     Args = parse_arguments()
     # Reindex PDB structure
     p = Path(Args.pdbfile)
     o = Path(Args.outfile)
-    if p.is_file() and o.parent.is_dir():
-        Struct, Name = parse_pdb(p)
-        Reindexed = reindex(Struct, Args.startidx)
-        # Save reindexed structure
-        io = PDBIO()
-        io.set_structure(Reindexed)
-        io.save(Args.outfile)
-        print(f'Reindexed file: {Name}_reindex.pdb')
-        print(f'Saved at this location: {o.parent}')
-    else:
-        print("Problem with input file or output path, check that both exist!")
-
-### MAIN
-if __name__=="__main__":
-    main()
+    reindex_pdb(Args.startidx, p, o)

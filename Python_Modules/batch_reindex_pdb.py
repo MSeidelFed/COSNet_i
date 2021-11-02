@@ -8,14 +8,16 @@ It runs reindex_pdb.py over a given list of pdbfiles.
 USAGE: python3 batch_reindex_pdb.py infile inputpath outputpath
 """
 ### IMPORTS
+import sys
 import argparse
-import subprocess
 from pathlib import Path
 
 ### PATH TO SCRIPTS
 sys.path.append(".")
 sys.path.append("Python_Modules")
 sys.path.append("../Python_Modules")
+
+from reindex_pdb import *
 
 ### FUNCTIONS
 def iterate_run_reindex(listofpdbtuples, pdbpath, outpath):
@@ -36,7 +38,7 @@ def iterate_run_reindex(listofpdbtuples, pdbpath, outpath):
         print(f"Running on protein # {counter}")
         print(f"Input: {pdbfile} Output: {outfile}")
         print(f"Start index {startidx}")
-        subprocess.run(["python3", "reindex_pdb.py", f"{startidx}", f"{pdbfile}", f"{outfile}"])
+        reindex_pdb(int(startidx), pdbfile, Path(outfile)) 
         counter+=1
     return
 
