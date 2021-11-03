@@ -15,7 +15,7 @@ Below is an illustration of the workflow. Current work is in progress to develop
 
 **Workflow**
 
-![Workflow](images/repo_workflow.tif)
+![Workflow](https://github.com/MSeidelFed/COSNet_i/blob/master/images/repo_workflow.tif)
 
 mmCIF icon was taken from [IUCr](http://ww1.iucr.org/)
 
