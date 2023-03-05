@@ -61,9 +61,9 @@ if __name__=="__main__":
         runlist=[]
         with open(infile, 'r') as f:
             for line in f.readlines():
-                contents=line.strip().split()
+                contents=line.strip().split(' ')
                 if not len(contents) == 3:
-                    runlist.append((contents[0], 1, contents[0][:-4]+'_reindex.pdb'))
+                    runlist.append((contents[0], 1, contents[1][:-4]+'_reindex.pdb'))
                 else:
                     runlist.append((contents[0], int(contents[1]), contents[2]))
         if runlist:
