@@ -47,7 +47,7 @@ def get_network_from_edges(edgelistfile):
     #for node in G.nodes():
         #print(f'Neighbors of node: {node}')
         #print(list(nx.all_neighbors(G,node)))
-    adjmtx = nx.adj_matrix(G)
+    adjmtx = nx.adjacency_matrix(G)
     adjmtx = adjmtx.todense()
     adjmtx = np.array(adjmtx, dtype = int)
     #degmtx = np.diag(np.sum(adjmtx, axis=0))
